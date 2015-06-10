@@ -1,0 +1,65 @@
+[{
+	"id":1,
+	"text":"Friend Find",
+	"attributes":{
+		"url":"abc",
+		"title":"aaa"
+	},
+	"children":[{
+		"id":11,
+		"text":"数据库表维护",
+		"state":"closed",
+		"children":[{
+			"id":111,
+			"text":"用户登录表",
+			"url":"#"
+		},{
+			"id":112,
+			"text":"用户数据表",
+			"url":"#"
+		},{
+			"id":113,
+			"text":"Hadoop配置表",
+			"url":"#"
+		}]
+	},{
+		"id":12,
+		"text":"聚类算法",
+		"children":[{
+			"id":121,
+			"text":"执行聚类",
+			"url":"#"
+		},{
+			"id":122,
+			"text":"画决策图",
+			"url":"#"
+			
+		},{
+			"id":123,
+			"text":"执行分类"
+		},{
+			"id":124,
+			"text":"Games",
+			"checked":true
+		}]
+	},{
+		"id":13,
+		"text":"图表展示",
+		"children":[{
+			"id":131,
+			"text":"聚类中心",
+			"url":"#"
+		},{
+			"id":132,
+			"text":"聚类群组",
+			"url":"#"
+			
+		}]
+	},{
+		"id":14,
+		"text":"about.html"
+	},{
+		"id":15,
+		"text":"welcome.html"
+	}]
+}]

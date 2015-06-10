@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE struts PUBLIC  
+    "-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"  
+    "http://struts.apache.org/dtds/struts-2.3.dtd">  
+      
+<struts>  
+    <constant name="struts.i18n.encoding" value="UTF-8" />  
+    <constant name="struts.action.extension" value="action" />  
+    <constant name="struts.serve.static.browserCache" value="false" /> 
+    <!-- 指定允许上传的文件最大字节数。默认值是2097152(2M) ,设置为1G-->
+    <constant name="struts.multipart.maxSize" value="1073741824"/>
+    <!-- 设置上传文件的临时文件夹,默认使用javax.servlet.context.tempdir -->
+    <constant name="struts.multipart.saveDir" value="d:/tmp" />
+    
+    
+      <package name ="test" namespace="/test" extends="struts-default">
+      		<action name ="test_*" method="{1}" class="com.fz.action.TestAction" >
+      		<!-- 	 <result name="success">/success.jsp</result>  
+            	<result name="error">/error.jsp</result>   
+            -->
+      		</action>
+      </package>
+      
+</struts> 
