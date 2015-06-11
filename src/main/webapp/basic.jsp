@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<%@ page language="java" pageEncoding="UTF-8" contentType="text/html; charset=UTF-8"%>
 <html>
 <head>
 	<meta charset="UTF-8">
@@ -11,7 +11,11 @@
 	<script type="text/javascript" src="js/basic.js"></script>
 </head>
 
-	<body class="easyui-layout">
+
+
+	
+<body  class="easyui-layout">
+	
 	<div data-options="region:'north',border:false" style="height:60px;background:#B3DFDA;padding:10px;">
 	<h1>Friend Find</h1> </div>
 	<div data-options="region:'west',split:true,title:'West'" style="width:170px;padding:10px;">
@@ -26,6 +30,6 @@
 	<div  data-options="region:'center',title:'Center'">
 		<div id="layout_center_tabs" class="easyui-tabs" data-options="fit:true" ></div>
 	</div>
+	<jsp:include page="login/login.jsp"></jsp:include>
 </body>
-
 </html>

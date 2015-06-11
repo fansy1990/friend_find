@@ -3,8 +3,13 @@
  */
 package com.fz.util;
 
+import java.io.IOException;
+
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.io.Text;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.LocatedFileStatus;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.RemoteIterator;
 
 /**
  * Hadoop 工具类
@@ -14,53 +19,61 @@ import org.apache.hadoop.io.Text;
 public class HUtils {
 
 	private static Configuration conf = null;
+	private static FileSystem fs = null;
+	
+	public static boolean flag = false; // get configuration from db or file  ,true : db,false:file
 	
 	public static Configuration getConf(){
 		
 		if(conf ==null){
 			conf = new Configuration ();
-			conf.setBoolean("mapreduce.app-submission.cross-platform", true);// 配置使用跨平台提交任务  
-		    conf.set("fs.defaultFS", "hdfs://node101:8020");//指定namenode    
-		    conf.set("mapreduce.framework.name", "yarn");  // 指定使用yarn框架  
-		    conf.set("yarn.resourcemanager.address", "node101:8032"); // 指定resourcemanager  
-		    conf.set("yarn.resourcemanager.scheduler.address", "node101:8030");// 指定资源分配器
+			if(flag){// get configuration from db
+				conf.setBoolean("mapreduce.app-submission.cross-platform", true);// 配置使用跨平台提交任务  
+				conf.set("fs.defaultFS", "hdfs://node101:8020");//指定namenode    
+				conf.set("mapreduce.framework.name", "yarn");  // 指定使用yarn框架  
+				conf.set("yarn.resourcemanager.address", "node101:8032"); // 指定resourcemanager  
+				conf.set("yarn.resourcemanager.scheduler.address", "node101:8030");// 指定资源分配器
+			}else{// get configuration from file
+				//System.out.println(Utils.getKey("mapreduce.app-submission.cross-platform"));
+				//System.out.println(Boolean.getBoolean(Utils.getKey("mapreduce.app-submission.cross-platform")));
+				conf.setBoolean("mapreduce.app-submission.cross-platform", 
+						"true".equals(Utils.getKey("mapreduce.app-submission.cross-platform")));// 配置使用跨平台提交任务  
+				conf.set("fs.defaultFS", Utils.getKey("fs.defaultFS"));//指定namenode    
+				conf.set("mapreduce.framework.name", Utils.getKey("mapreduce.framework.name"));  // 指定使用yarn框架  
+				conf.set("yarn.resourcemanager.address", Utils.getKey("yarn.resourcemanager.address")); // 指定resourcemanager  
+				conf.set("yarn.resourcemanager.scheduler.address", 
+						Utils.getKey("yarn.resourcemanager.scheduler.address"));// 指定资源分配器
+			}
 		}
 		
 		return conf;
 	}
 	
-	
-	/**
-	 * 使用欧式距离
-	 * @param inputI
-	 * @param ds
-	 * @return
-	 */
-	public static double getDistance(double[] inputI, double[] ds) {
-		double error =0.0;
-		for(int i=0;i<inputI.length;i++){
-			error+=(inputI[i]-ds[i])*(inputI[i]-ds[i]);
+	public static FileSystem getFs(){
+		if(fs==null){
+			try {
+				fs=FileSystem.get(getConf());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
-		return Math.sqrt(error);
+		return fs;
 	}
-	
-	
-
 	/**
-	 * @param value
+	 * 获取hdfs文件目录及其子文件夹信息
+	 * @param input
+	 * @param recursive
 	 * @return
+	 * @throws IOException
 	 */
-	public static double[] getInputI(Text value,String splitter) {
-		return getInputI(value.toString(),splitter);
-	}
-	
-	public static double[] getInputI(String value,String splitter){
-		String[] inputStrArr = value.split(splitter);
-		double[] inputI = new double[inputStrArr.length];
+	public static  String getHdfsFiles(String input,boolean recursive) throws IOException{
+		RemoteIterator<LocatedFileStatus> files=getFs().listFiles(new Path(input), recursive);
+		StringBuffer buff = new StringBuffer();
+		while(files.hasNext()){
+			buff.append(files.next().getPath().toString()).append("<br>");
+		}
 		
-		for(int i=0;i<inputI.length;i++){
-			inputI[i]= Double.parseDouble(inputStrArr[i]);
-		}
-		return inputI;
+		return buff.toString();
 	}
+	
 }

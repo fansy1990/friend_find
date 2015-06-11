@@ -20,5 +20,10 @@
             -->
       		</action>
       </package>
+      <package name ="login" namespace="/login" extends="struts-default">
+      		<action name ="loginUser_*" method="{1}" class="com.fz.action.LoginUserAction" >
+      		
+      		</action>
+      </package>
       
 </struts> 

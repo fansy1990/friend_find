@@ -26,8 +26,8 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-import com.fz.mr.cluster.KeyDoubleArr;
-import com.fz.mr.cluster.SumDistance;
+//import com.fz.mr.cluster.KeyDoubleArr;
+//import com.fz.mr.cluster.SumDistance;
 import com.fz.util.HUtils;
 
 /**
@@ -87,14 +87,14 @@ public class DrawPic {
 		try {
 			reader = new SequenceFile.Reader(conf, Reader.file(path),
 					Reader.bufferSize(4096), Reader.start(0));
-			KeyDoubleArr dkey = (KeyDoubleArr) ReflectionUtils.newInstance(
-					reader.getKeyClass(), conf);
-			SumDistance dvalue = (SumDistance) ReflectionUtils.newInstance(
-					reader.getValueClass(), conf);
+//			KeyDoubleArr dkey = (KeyDoubleArr) ReflectionUtils.newInstance(
+//					reader.getKeyClass(), conf);
+//			SumDistance dvalue = (SumDistance) ReflectionUtils.newInstance(
+//					reader.getValueClass(), conf);
 
-			while (reader.next(dkey, dvalue)) {// 循环读取文件
-				xyseries.add(dvalue.getSum(), dvalue.getDistance());
-			}
+//			while (reader.next(dkey, dvalue)) {// 循环读取文件
+//				xyseries.add(dvalue.getSum(), dvalue.getDistance());
+//			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

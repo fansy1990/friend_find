@@ -3,6 +3,8 @@ package com.fz.dao;
 import java.io.Serializable;  
 import java.math.BigInteger;
 import java.util.List;  
+
+import javax.transaction.Transactional;
   
 import org.hibernate.Query;  
 import org.hibernate.Session;  
