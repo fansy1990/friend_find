@@ -6,7 +6,6 @@ package com.fz.service;
 import java.util.List;
 
 import javax.annotation.Resource;
-import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +57,17 @@ public class DBService {
 			return true;
 		}
 		return false;
+	}
+	
+	
+	public String getHConstValue(String key){
+		
+		HConstants hc = baseDaoHConst.find("from HConstants hc where hc.custKey='"+key+"'").get(0);
+		if(hc==null){
+			log.info("Hadoop基础配置表找不到配置的key：{}",key);
+			return null;
+		}
+		return hc.getCustValue();
 	}
 	
 	

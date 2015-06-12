@@ -27,6 +27,12 @@ public class HConstants implements Serializable {
 	
 	public HConstants(){	}
 	
+	public HConstants(String key,String value,String desc){
+		this.custKey=key;
+		this.custValue=value;
+		this.description=desc;
+	}
+	
 	@Id
 	@GeneratedValue
 	public Integer getId() {

@@ -9,7 +9,11 @@
 		"id":11,
 		"text":"数据库表维护",
 		"state":"closed",
-		"children":[{
+		"children":[	{
+			"id":110,
+			"text":"初始化表",
+			"url":"db/initial.jsp"
+		},{
 			"id":111,
 			"text":"用户登录表",
 			"url":"#"

@@ -1,14 +1,11 @@
 package com.fz.action;
 
-import java.io.PrintWriter;
-
 import javax.annotation.Resource;
 
-import org.apache.struts2.ServletActionContext;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
 
 import com.fz.service.TestService;
+import com.fz.util.Utils;
 import com.opensymphony.xwork2.ActionSupport;
 
 @Component("testAction")
@@ -34,22 +31,21 @@ public class TestAction extends ActionSupport {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public void test(){
-		PrintWriter writer=null;
-		String info="name:"+name+",email:"+email;
-		System.out.println(info);
+	public void test(){	
+		
+	}
+	/**
+	 * 初始化插入数据库表中数据
+	 * 更新登录表
+	 * 更新集群配置表
+	 */
+	public void insertTable(){
 		try{
-			writer= ServletActionContext.getResponse().getWriter();
-			writer.write(info);//响应输出
-			testService.saveUser();
-			//释放资源，关闭流
-			writer.flush();
-			writer.close();
+			boolean flag = testService.insertTables();
+			Utils.write2PrintWriter(flag);
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-		
-		
 	}
 	
 }

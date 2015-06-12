@@ -26,6 +26,10 @@ public class LoginUser implements Serializable {
 	private String description;
 	
 	public LoginUser(){	}
+	public LoginUser(String username,String password){
+		this.username=username;
+		this.password=password;
+	}
 	
 	@Id
 	@GeneratedValue

@@ -6,10 +6,13 @@ package com.fz.util;
 //import java.util.HashMap;
 import java.io.PrintWriter;
 import java.util.Locale;
-//import java.util.Map;
 import java.util.ResourceBundle;
 
+import javax.annotation.Resource;
+
 import org.apache.struts2.ServletActionContext;
+
+import com.fz.service.DBService;
 
 /**
  * 工具类
@@ -23,7 +26,13 @@ public class Utils {
 	private static ResourceBundle resb = null;
 	private static PrintWriter  writer=null;
 	
-	public static String  getKey(String key){
+	@Resource
+	private static DBService dBService;
+	
+	public static String getKey(String key,boolean dbOrFile){
+		if(dbOrFile){
+			return dBService.getHConstValue(key);
+		}
 		if(resb==null){
 			Locale locale = new Locale("zh", "CN"); 
             resb = ResourceBundle.getBundle("util", locale); 
