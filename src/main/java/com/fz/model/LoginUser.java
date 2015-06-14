@@ -1,6 +1,7 @@
 package com.fz.model;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,7 +15,7 @@ import javax.persistence.Table;
  * @author fansy
  * @date 2015-6-10
  */
-public class LoginUser implements Serializable {
+public class LoginUser implements Serializable,ObjectInterface {
 	
 	/**
 	 * 
@@ -31,6 +32,14 @@ public class LoginUser implements Serializable {
 		this.password=password;
 	}
 	
+	public Object setObjectByMap(Map<String,Object> map){
+		LoginUser lu = new LoginUser();
+		lu.setDescription((String)map.get("description"));
+		lu.setId((Integer)map.get("id"));// 修改是有id的，新增没有id
+		lu.setPassword((String)map.get("password"));
+		lu.setUsername((String)map.get("username"));
+		return lu;
+	}
 	@Id
 	@GeneratedValue
 	public Integer getId() {

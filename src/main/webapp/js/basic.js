@@ -13,10 +13,14 @@ $(function(){
 	$('#navid').tree({
 		onClick: function(node){
 //			alert(node.text+","+node.url);  // alert node text property when clicked
-			console.info(node.text+","+node.url);
+			console.info("click:"+node.text);
+			if(node.attributes.folder=='1'){
+				return ;
+			}
+			console.info("open url:"+node.attributes.url)	
 			var url;
-			if (node.url) {
-				url = node.url;
+			if (node.attributes.url) {
+				url = node.attributes.url;
 			} else {
 				url = '404.jsp';
 			}

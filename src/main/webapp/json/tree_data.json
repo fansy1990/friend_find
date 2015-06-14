@@ -3,67 +3,117 @@
 	"text":"Friend Find",
 	"attributes":{
 		"url":"abc",
-		"title":"aaa"
+		"title":"aaa",
+		"folder":"1"
 	},
 	"children":[{
 		"id":11,
 		"text":"数据库表维护",
-		"state":"closed",
+		"attributes":{
+			"folder":"1"
+		},
+		"state":"open",
 		"children":[	{
 			"id":110,
 			"text":"初始化表",
-			"url":"db/initial.jsp"
+			"attributes":{
+				"folder":"0",
+				"url":"db/initial.jsp"
+			}	
 		},{
 			"id":111,
 			"text":"用户登录表",
-			"url":"#"
+			"attributes":{
+				"folder":"0",
+				"url":"db/loginuser.jsp"
+			}
 		},{
 			"id":112,
 			"text":"用户数据表",
-			"url":"#"
+			"attributes":{
+				"folder":"0",
+				"url":"db/userdata.jsp"
+			}
 		},{
 			"id":113,
 			"text":"Hadoop配置表",
-			"url":"#"
+			"attributes":{
+				"folder":"0",
+				"url":"db/hconstants.jsp"
+			}
 		}]
 	},{
 		"id":12,
 		"text":"聚类算法",
+		"attributes":{
+				"folder":"1"
+		},
 		"children":[{
 			"id":121,
 			"text":"执行聚类",
-			"url":"#"
+			"attributes":{
+				"folder":"0",
+				"url":""
+			}
 		},{
 			"id":122,
 			"text":"画决策图",
-			"url":"#"
+			"attributes":{
+				"folder":"0",
+				"url":""
+			}
 			
 		},{
 			"id":123,
-			"text":"执行分类"
+			"text":"执行分类",
+			"attributes":{
+				"folder":"0",
+				"url":""
+			}
 		},{
 			"id":124,
 			"text":"Games",
-			"checked":true
+			"checked":true,
+			"attributes":{
+				"folder":"0",
+				"url":""
+			}
 		}]
 	},{
 		"id":13,
 		"text":"图表展示",
+		"attributes":{
+				"folder":"1"
+		},
 		"children":[{
 			"id":131,
 			"text":"聚类中心",
-			"url":"#"
+			"attributes":{
+				"folder":"0",
+				"url":""
+			}
 		},{
 			"id":132,
 			"text":"聚类群组",
-			"url":"#"
+			"attributes":{
+				"folder":"0",
+				"url":""
+			}
 			
 		}]
 	},{
 		"id":14,
-		"text":"about.html"
+		"text":"about.html",
+		"attributes":{
+				"folder":"0",
+				"url":"about.html"
+			}
 	},{
 		"id":15,
-		"text":"welcome.html"
+		"text":"welcome.html",
+		"attributes":{
+				"folder":"0",
+				"url":"index.jsp"
+		}
 	}]
 }]

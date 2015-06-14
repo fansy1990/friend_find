@@ -9,6 +9,7 @@
 	<script type="text/javascript" src="js/jquery.min.js"></script>
 	<script type="text/javascript" src="js/jquery.easyui.min.js"></script>
 	<script type="text/javascript" src="js/basic.js"></script>
+	<script type="text/javascript" src="js/loginuser.js"></script>
 	
 </head>
 
@@ -26,7 +27,7 @@
 	<div data-options="region:'east',split:true,collapsed:true,title:'East'" style="width:100px;padding:10px;">east region</div>
 	 -->
 	<div data-options="region:'south',border:false" style="height:50px;background:#A9FACD;padding:10px;">
-		<h1 style="text-align:center"> © Copyright<br>版权所有</h1>
+		<h2 style="text-align:center"> © Copyright 版权所有</h2>
 	</div>
 	<div  data-options="region:'center',title:'Center'">
 		<div id="layout_center_tabs" class="easyui-tabs" data-options="fit:true" ></div>

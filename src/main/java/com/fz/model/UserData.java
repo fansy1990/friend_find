@@ -2,6 +2,7 @@ package com.fz.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -17,7 +18,7 @@ import javax.persistence.Table;
  * @author fansy
  * @date 2015-6-10
  */
-public class UserData implements Serializable {
+public class UserData implements Serializable,ObjectInterface {
 	
 	/**
 	 * 
@@ -25,7 +26,7 @@ public class UserData implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Integer id;
 	private Integer reputation;
-	private Date creationData;
+	private Date creationDate;
 	private String displayName;
 	private String emailHash;
 	private Date lastAccessDate;
@@ -54,14 +55,6 @@ public class UserData implements Serializable {
 
 	public void setReputation(Integer reputation) {
 		this.reputation = reputation;
-	}
-
-	public Date getCreationData() {
-		return creationData;
-	}
-
-	public void setCreationData(Date creationData) {
-		this.creationData = creationData;
 	}
 
 	public String getDisplayName() {
@@ -142,6 +135,26 @@ public class UserData implements Serializable {
 
 	public void setDownVotes(Integer downVotes) {
 		this.downVotes = downVotes;
+	}
+
+	@Override
+	public Object setObjectByMap(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * @return the creationDate
+	 */
+	public Date getCreationDate() {
+		return creationDate;
+	}
+
+	/**
+	 * @param creationDate the creationDate to set
+	 */
+	public void setCreationDate(Date creationDate) {
+		this.creationDate = creationDate;
 	}
 	
 }

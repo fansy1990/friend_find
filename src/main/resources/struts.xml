@@ -21,9 +21,11 @@
       		</action>
       </package>
       <package name ="login" namespace="/login" extends="struts-default">
-      		<action name ="loginUser_*" method="{1}" class="com.fz.action.LoginUserAction" >
-      		
-      		</action>
+      		<action name ="loginUser_*" method="{1}" class="com.fz.action.LoginUserAction" />
+      </package>
+      
+       <package name ="dB" namespace="/dB" extends="struts-default">
+      		<action name ="dB_*" method="{1}" class="com.fz.action.DBAction" />
       </package>
       
 </struts> 

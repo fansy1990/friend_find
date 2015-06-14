@@ -3,7 +3,9 @@
  */
 package com.fz.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -15,6 +17,7 @@ import com.fz.dao.BaseDAO;
 import com.fz.model.HConstants;
 import com.fz.model.LoginUser;
 import com.fz.model.UserData;
+import com.fz.util.Utils;
 
 /**
  * 数据库service
@@ -33,6 +36,8 @@ public class DBService {
 	private BaseDAO<LoginUser> baseDaoLU;
 	@Resource
 	private BaseDAO<UserData> baseDaoUD;
+	@Resource
+	private BaseDAO<Object> baseDao;
 	
 	/**
 	 * 用户登录检查
@@ -58,8 +63,56 @@ public class DBService {
 		}
 		return false;
 	}
+
 	
+	/**
+	 * 分页获取tableName 所有数据
+	 * @param tableName:类实体名
+	 * @param rows
+	 * @param page
+	 * @return
+	 */
+	public Map<String,Object> getTableData(String tableName,int rows,int page){
+		String hql = "from "+tableName;
+		String hqlCount = "select count(1) from "+tableName;
+		List<Object> list =baseDao.find(hql, new Object[]{}, page, rows);
+		Map<String ,Object> jsonMap = new HashMap<String,Object>();
+		jsonMap.put("total", baseDaoLU.count(hqlCount));
+		jsonMap.put("rows", list);
+		return jsonMap;
+	}
 	
+	public boolean deleteById(String tableName,String id){
+		String hql ="delete " + tableName +"  tb where tb.id='"+id+"'";
+		try{
+			Integer ret = baseDao.executeHql(hql);
+			log.info("删除表{},删除了{}条记录！",new Object[]{tableName,ret});
+		}catch(Exception e){
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+	
+	public boolean updateOrSave(String tableName,String json){
+		try{
+			// 根据表名获得实体类，并赋值
+			Object o = Utils.getEntity(Utils.getEntityPackages(tableName),json);
+			baseDao.saveOrUpdate(o);
+			log.info("保存表{}！",new Object[]{tableName});
+		}catch(Exception e){
+			
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * 获得Hadoop集群配置
+	 * @param key
+	 * @return
+	 */
 	public String getHConstValue(String key){
 		
 		HConstants hc = baseDaoHConst.find("from HConstants hc where hc.custKey='"+key+"'").get(0);

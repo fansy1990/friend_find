@@ -1,6 +1,7 @@
 package com.fz.model;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,7 +15,7 @@ import javax.persistence.Table;
  * @author fansy
  * @date 2015-6-10
  */
-public class HConstants implements Serializable {
+public class HConstants implements Serializable,ObjectInterface {
 	
 	/**
 	 * 
@@ -64,6 +65,16 @@ public class HConstants implements Serializable {
 
 	public void setCustValue(String custValue) {
 		this.custValue = custValue;
+	}
+
+	@Override
+	public Object setObjectByMap(Map<String, Object> map) {
+		HConstants hc = new HConstants();
+		hc.setCustKey((String)map.get("custKey"));
+		hc.setCustValue((String)map.get("custValue"));
+		hc.setDescription((String)map.get("description"));
+		hc.setId((Integer)map.get("id"));
+		return hc;
 	}
 	
 }
