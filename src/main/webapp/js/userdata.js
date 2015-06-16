@@ -29,10 +29,10 @@ $(function() {
 							width : '120',
 							editor: {//设置其为可编辑
 		                        type: 'validatebox',//设置编辑样式 自带样式有：text，textarea，checkbox，numberbox，validatebox，datebox，combobox，combotree 可自行扩展
-		                        options: {
-		                        	required: true//设置编辑规则属性
-		                    }
-						},
+		                        options: {required: true//设置编辑规则属 
+		                        	}
+		                        }
+		                 },
 						{
 							field : 'downVotes',
 							title : '反对数',
@@ -42,7 +42,7 @@ $(function() {
 		                        options: {
 		                        	required: true//设置编辑规则属性
 		                    }
-						},
+						}},
 						{
 							field : 'upVotes',
 							title : '支持数',
@@ -52,7 +52,7 @@ $(function() {
 		                        options: {
 		                        	required: true//设置编辑规则属性
 		                    }
-						},
+						}},
 						{
 							field : 'views',
 							title : '浏览数',
@@ -62,7 +62,7 @@ $(function() {
 		                        options: {
 		                        	required: true//设置编辑规则属性
 		                    }
-						},
+						}},
 						{
 							field : 'reputation',
 							title : '声望值',
@@ -72,17 +72,17 @@ $(function() {
 		                        options: {
 		                        	required: true//设置编辑规则属性
 		                    }
-						},
+						}},
 						{
 							field : 'aboutMe',
 							title : '关于我',
-							width : '200',
+							width : '300',
+							height：'50',
 							editor: {//设置其为可编辑
 		                        type: 'validatebox',//设置编辑样式 自带样式有：text，textarea，checkbox，numberbox，validatebox，datebox，combobox，combotree 可自行扩展
 		                        options: {
 		                        	required: true//设置编辑规则属性
-		                    }
-						}
+		                    }}
 						}
 						 ]],
 						 toolbar: [{//在dategrid表单的头部添加按钮
@@ -170,6 +170,35 @@ $(function() {
 	//loginuserid
 });
 
+
+function deleteRow(index,rowIndex){  
+    $.messager.confirm('Confirm','确认删除?',function(r){  
+        if (r){               
+            $.ajax({  
+                url : 'dB/dB_deleteById.action',  
+                data: {id:index,tableName:'UserData'},
+                type : 'GET',                     
+                timeout : 60000,  
+                success : function(data, textStatus, jqXHR) {     
+                    var msg = '删除';  
+                    if(data == 'success') {  // 
+                    	console.info(index);
+                    	 
+                    	 $.messager.alert('提示', msg + '成功！', 'info', function() {  
+                    		 $("#userdataid").datagrid('deleteRow', rowIndex); 
+                    	 });
+                        return;  
+                    } else {  
+                        $.messager.alert('提示', msg + '失败！', 'error', function() {  
+                        });  
+                    }  
+                }  
+            });   
+              
+        }  
+    });  
+}
+
 function saveRow(index,node){  
 //	console.info("node.id:"+node.id+",node.username:"+node.username);
 //	var json={id:node.id,custKey:node.custKey,custValue:node.custValue,description:node.description};
@@ -177,7 +206,7 @@ function saveRow(index,node){
 			displayName:node.displayName,downVotes:node.downVotes,emailHash:node.emailHash,
 			lastAccessDate:node.lastAccessDate,location:node.location,reputation:node.reputation,
 			upVotes:node.upVotes,views:node.views,websiteUrl:node.websiteUrl};
-	}
+	
 	var encodeJson=JSON.stringify(json);
     $.ajax({  
         url : 'dB/dB_updateOrSave.action',  

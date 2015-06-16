@@ -65,6 +65,21 @@ public class DBAction extends ActionSupport {
 		log.info("保存表"+tableName+(delSuccess?"成功":"失败"+"!"));
 		Utils.write2PrintWriter(msg);
 	}
+	/**
+	 * 初始化表 
+	 */
+	public void initialTable(){
+		boolean initRet = false;
+		if("LoginUser".equals(tableName)){
+			initRet=dBService.insertLoginUser();
+		}else if("HConstants".equals(tableName)){
+			initRet=dBService.insertHConstants();
+		}else{
+			initRet = dBService.insertUserData();
+		}
+		
+		Utils.write2PrintWriter(initRet);
+	}
 
 	public int getRows() {
 		return rows;

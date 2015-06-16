@@ -178,5 +178,6 @@ public interface BaseDAO<T> {
 	 * @param lists
 	 * @return
 	 */
-	Integer saveBatch(List<T> lists);
+	Integer saveBatch(List<Object> lists);
+
 }  

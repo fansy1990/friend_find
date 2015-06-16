@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.List;  
 
+import javax.transaction.Transaction;
 import javax.transaction.Transactional;
   
 import org.hibernate.Query;  
@@ -181,9 +182,29 @@ public class BaseDAOImpl<T> implements BaseDAO<T> {
     }
 
 	@Override
-	public Integer saveBatch(List<T> lists) {
-		// TODO Auto-generated method stub
-		return null;
+	public Integer saveBatch(List<Object> lists) {
+		Session session = this.getCurrentSession();
+//		org.hibernate.Transaction tx = session.beginTransaction();
+		int i=0;
+		try{
+		for ( Object l:lists) {
+			i++;
+		    session.save(l);
+			if( i % 50 == 0 ) { // Same as the JDBC batch size
+		        //flush a batch of inserts and release memory:
+		        session.flush();
+		        session.clear();
+		        if(i%1000==0){
+		        	System.out.println(new java.util.Date()+"：已经预插入了"+i+"条记录...");
+		        }
+		    }
+		}}catch(Exception e){
+			e.printStackTrace();
+		}
+//		tx.commit();
+//		session.close();
+		return i;
 	}
+
   
 }  

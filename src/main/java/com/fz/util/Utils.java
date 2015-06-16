@@ -4,19 +4,29 @@
 package com.fz.util;
 
 //import java.util.HashMap;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
 import javax.annotation.Resource;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.struts2.ServletActionContext;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.springframework.web.context.ContextLoader;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import com.fz.model.ObjectInterface;
 import com.fz.service.DBService;
@@ -33,8 +43,23 @@ public class Utils {
 	private static ResourceBundle resb = null;
 	private static PrintWriter  writer=null;
 	
+	
+	private static String[] userdata_attributes=new String[]{"Id","Reputation","CreationDate","DisplayName",
+			"EmailHash","LastAccessDate","Location","Age","AboutMe","Views","UpVotes","DownVotes"};
+	private static String userdata_elementName="row";
+	private static String userdata_xmlPath="ask_ubuntu_users.xml";
+	
+	
 	@Resource
 	private static DBService dBService;
+	
+	/**
+	 * 初始化登录表数据
+	 */
+//	static{// 这种方式不行
+//		dBService.insertLoginUser();
+//		System.out.println(new java.util.Date()+"：初始化登录表完成！");
+//	}
 	
 	public static String getKey(String key,boolean dbOrFile){
 		if(dbOrFile){
@@ -102,6 +127,48 @@ public class Utils {
 	
 	public static String getEntityPackages(String tableName){
 		return "com.fz.model."+tableName;
+	}
+	
+	/**
+	 * 把xml转为字符串数组
+	 * @param xmlPath
+	 * @return
+	 */
+	public static List<String[]> parseXml2StrArr(String xmlPath){
+		if(xmlPath==null){
+			
+			String tmp= ContextLoader.getCurrentWebApplicationContext().getServletContext().getRealPath("/");
+			System.out.println(tmp);
+			xmlPath=tmp+"WEB-INF/classes/"+userdata_xmlPath;
+		}
+		DocumentBuilderFactory dbf=DocumentBuilderFactory.newInstance();
+		Document doc=null;
+		  try{
+		  DocumentBuilder db=dbf.newDocumentBuilder();  
+		  doc=db.parse(new File(xmlPath)); 
+		  	}catch(Exception e){
+			  e.printStackTrace();
+		  }
+		  List<String[]> strings=new ArrayList<String[]>();
+        try{
+            NodeList nodeList=doc.getElementsByTagName(userdata_elementName);
+            
+            for(int i=0;i< nodeList.getLength();i++){
+	            Node node0=nodeList.item(i);
+	            NamedNodeMap m1=node0.getAttributes();
+	            String[] attrValues=new String[userdata_attributes.length];
+	            for(int j=0;j<userdata_attributes.length;j++){
+	            	Node nodeAttri=m1.getNamedItem(userdata_attributes[j]);
+	            	if(nodeAttri!=null){
+	            		attrValues[j]=nodeAttri.getNodeValue();
+	            	}
+	            }
+	           strings.add(attrValues); // throw data format exception
+            }
+        }catch(Exception e){
+        	e.printStackTrace();
+        }
+        return strings;
 	}
 	
 	

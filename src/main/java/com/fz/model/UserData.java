@@ -1,12 +1,19 @@
 package com.fz.model;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
+import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 
 @Entity
@@ -40,8 +47,36 @@ public class UserData implements Serializable,ObjectInterface {
 	
 	public UserData(){	}
 	
+	public UserData(String[] s) throws ParseException{
+		if(s[1]!=null){
+			this.reputation=Integer.parseInt(s[1]);
+		}
+//		this.creationDate=new SimpleDateFormat("yyyy-MM-ddTHH:mm:ss.sss").parse( s[2]);
+		
+		this.creationDate=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.sss").parse( s[2].replaceAll("T", " "));
+		this.displayName=s[3];
+		this.emailHash=s[4];
+//		this.lastAccessDate=new SimpleDateFormat("yyyy-MM-ddTHH:mm:ss.sss").parse(s[5]);
+		this.lastAccessDate=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.sss").parse( s[5].replaceAll("T", " "));
+		this.location=s[6];
+		if(s[7]!=null){
+			this.age=Integer.parseInt(s[7]);
+		}
+		this.aboutMe=s[8];
+		if(s[9]!=null){
+			this.views=Integer.parseInt(s[9]);
+		}
+		if(s[10]!=null){
+			this.upVotes=Integer.parseInt(s[10]);
+		}
+		if(s[11]!=null){
+			this.downVotes=Integer.parseInt(s[11]);
+		}
+		
+	}
+	
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	public Integer getId() {
 		return id;
 	}
@@ -105,6 +140,9 @@ public class UserData implements Serializable,ObjectInterface {
 		this.age = age;
 	}
 
+//	@Lob 
+//	@Basic(fetch = FetchType.LAZY) 
+	@Column(length=1000) 
 	public String getAboutMe() {
 		return aboutMe;
 	}
@@ -139,8 +177,21 @@ public class UserData implements Serializable,ObjectInterface {
 
 	@Override
 	public Object setObjectByMap(Map<String, Object> map) {
-		// TODO Auto-generated method stub
-		return null;
+		UserData ud = new UserData();
+		ud.setAboutMe((String)map.get("aboutMe"));
+		ud.setAge((Integer)map.get("age"));
+		ud.setCreationDate((Date)map.get("creationDate"));// 类型格式？
+		ud.setDisplayName((String)map.get("displayName"));
+		ud.setDownVotes((Integer)map.get("downVotes"));
+		ud.setEmailHash((String) map.get("emailHash"));
+		ud.setId((Integer)map.get("id"));
+		ud.setLastAccessDate((Date)map.get("lastAccessDate"));
+		ud.setLocation((String)map.get("location"));
+		ud.setReputation((Integer)map.get("reputation"));
+		ud.setUpVotes((Integer)map.get("upVotes"));
+		ud.setViews((Integer)map.get("views"));
+		ud.setWebsiteUrl((String)map.get("webSiteUrl"));
+		return ud;
 	}
 
 	/**
