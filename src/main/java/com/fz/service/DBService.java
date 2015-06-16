@@ -27,7 +27,6 @@ import com.fz.util.Utils;
  * @date 2015-6-10
  */
 @Service("dBService")
-
 public class DBService {
 	
 	private Logger log = LoggerFactory.getLogger(DBService.class);

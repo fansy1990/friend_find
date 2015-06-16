@@ -14,7 +14,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-import javax.annotation.Resource;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -39,6 +38,10 @@ import com.fz.service.DBService;
 public class Utils {
 
 	// hadoop 常量
+	
+	//
+	public static String baseServicePacakges="com.fz.service.*";
+	
 //	private static Map<String,String> HADOOPCONSTANTS=new HashMap<String,String>();
 	private static ResourceBundle resb = null;
 	private static PrintWriter  writer=null;
@@ -50,8 +53,6 @@ public class Utils {
 	private static String userdata_xmlPath="ask_ubuntu_users.xml";
 	
 	
-	@Resource
-	private static DBService dBService;
 	
 	/**
 	 * 初始化登录表数据
@@ -63,7 +64,8 @@ public class Utils {
 	
 	public static String getKey(String key,boolean dbOrFile){
 		if(dbOrFile){
-			return dBService.getHConstValue(key);
+			DBService dbService =(DBService)SpringUtil.getBean("dBService");
+			return dbService.getHConstValue(key);
 		}
 		if(resb==null){
 			Locale locale = new Locale("zh", "CN"); 
@@ -170,6 +172,7 @@ public class Utils {
         }
         return strings;
 	}
+
 	
 	
 	

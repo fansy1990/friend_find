@@ -33,6 +33,10 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		
 		<a id="initialId" href="#" class="easyui-linkbutton"
 			data-options="iconCls:'icon-search'">初始化</a> <br>
+			
+			
+		<a id="testId" href="#" class="easyui-linkbutton"
+			data-options="iconCls:'icon-search'">测试</a> <br>	
 
 	</div>
 	<script type="text/javascript" src="js/initial.js"></script>

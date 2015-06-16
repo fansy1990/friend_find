@@ -1,10 +1,13 @@
 package com.fz.action;
 
+import java.io.IOException;
+
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Component;
 
 import com.fz.service.TestService;
+import com.fz.util.HUtils;
 import com.fz.util.Utils;
 import com.opensymphony.xwork2.ActionSupport;
 
@@ -32,7 +35,11 @@ public class TestAction extends ActionSupport {
 		this.name = name;
 	}
 	public void test(){	
-		
+		try {
+			HUtils.getJobs();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	/**
 	 * 初始化插入数据库表中数据
