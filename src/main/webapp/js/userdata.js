@@ -77,7 +77,6 @@ $(function() {
 							field : 'aboutMe',
 							title : '关于我',
 							width : '300',
-							height：'50',
 							editor: {//设置其为可编辑
 		                        type: 'validatebox',//设置编辑样式 自带样式有：text，textarea，checkbox，numberbox，validatebox，datebox，combobox，combotree 可自行扩展
 		                        options: {

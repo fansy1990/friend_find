@@ -10,6 +10,8 @@
 	<script type="text/javascript" src="js/jquery.easyui.min.js"></script>
 	<script type="text/javascript" src="js/basic.js"></script>
 	<script type="text/javascript" src="js/loginuser.js"></script>
+	<script type="text/javascript" src="js/monitor.js"></script>
+	
 	
 </head>
 
@@ -26,11 +28,14 @@
 	<!-- 
 	<div data-options="region:'east',split:true,collapsed:true,title:'East'" style="width:100px;padding:10px;">east region</div>
 	 -->
-	<div data-options="region:'south',border:false" style="height:50px;background:#A9FACD;padding:10px;">
+	<div data-options="region:'south',border:false" style="height:30px;background:#A9FACD;padding:5px;">
 		<h2 style="text-align:center"> © Copyright 版权所有</h2>
 	</div>
+	
 	<div  data-options="region:'center',title:'Center'">
-		<div id="layout_center_tabs" class="easyui-tabs" data-options="fit:true" ></div>
+		<div id="layout_center_tabs" class="easyui-tabs" data-options="fit:true" >
+			<div title="Welcome" data-options="href:'about.html',iconCls:'icon-tip'"></div>
+		</div>
 	</div>
 	<jsp:include page="login/login.jsp"></jsp:include>
 </body>

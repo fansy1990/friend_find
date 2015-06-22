@@ -169,6 +169,7 @@ public class DBService {
 			baseDao.save(new HConstants("mapreduce.framework.name","yarn","mapreduce 使用配置"));
 			baseDao.save(new HConstants("yarn.resourcemanager.address","node101:8032","ResourceManager主机及端口"));
 			baseDao.save(new HConstants("yarn.resourcemanager.scheduler.address","node101:8030","Scheduler主机及端口"));
+			baseDao.save(new HConstants("mapreduce.jobhistory.address","node101:10020","JobHistory主机及端口"));
 		}catch(Exception e){
 			e.printStackTrace();
 			return false;

@@ -52,7 +52,7 @@ public class Utils {
 	private static String userdata_elementName="row";
 	private static String userdata_xmlPath="ask_ubuntu_users.xml";
 	
-	
+	private static int counter=0;// 在任务运行时返回递增的点字符串
 	
 	/**
 	 * 初始化登录表数据
@@ -126,9 +126,29 @@ public class Utils {
 		}
 		return null;
 	}
-	
+	/**
+	 *  获得表的实体类的全路径
+	 * @param tableName
+	 * @return
+	 */
 	public static String getEntityPackages(String tableName){
 		return "com.fz.model."+tableName;
+	}
+	/**
+	 * 获得根路径
+	 * @return
+	 */
+	private static String getRootPath(){
+		return ContextLoader.getCurrentWebApplicationContext().getServletContext().getRealPath("/");
+	}
+	
+	/**
+	 * 获得根路径下面的subPath路径
+	 * @param subPath
+	 * @return
+	 */
+	public static String getRootPathBasedPath(String subPath){
+		return getRootPath()+subPath;
 	}
 	
 	/**
@@ -139,7 +159,7 @@ public class Utils {
 	public static List<String[]> parseXml2StrArr(String xmlPath){
 		if(xmlPath==null){
 			
-			String tmp= ContextLoader.getCurrentWebApplicationContext().getServletContext().getRealPath("/");
+			String tmp= getRootPath();
 			System.out.println(tmp);
 			xmlPath=tmp+"WEB-INF/classes/"+userdata_xmlPath;
 		}
@@ -173,6 +193,21 @@ public class Utils {
         return strings;
 	}
 
+	/**
+	 * 获得递增点字符串
+	 * @return
+	 */
+	public static String getDotState(String pre){
+		counter++;
+		StringBuffer buff =new StringBuffer();
+		for(int i=0;i<counter;i++){
+			buff.append(".");
+		}
+		if(counter>=7){
+			counter=0;
+		}
+		return pre+buff.toString();
+	}
 	
 	
 	

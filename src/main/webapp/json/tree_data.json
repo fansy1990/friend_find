@@ -53,14 +53,14 @@
 			"text":"执行聚类",
 			"attributes":{
 				"folder":"0",
-				"url":""
+				"url":"cluster/runCluster1.jsp"
 			}
 		},{
 			"id":122,
 			"text":"画决策图",
 			"attributes":{
 				"folder":"0",
-				"url":""
+				"url":"photo/draw_decision_chart.jsp"
 			}
 			
 		},{

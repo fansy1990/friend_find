@@ -27,5 +27,8 @@
        <package name ="dB" namespace="/dB" extends="struts-default">
       		<action name ="dB_*" method="{1}" class="com.fz.action.DBAction" />
       </package>
+      <package name ="cloud" namespace="/cloud" extends="struts-default">
+      		<action name ="cloud_*" method="{1}" class="com.fz.action.CloudAction" />
+      </package>
       
 </struts> 
