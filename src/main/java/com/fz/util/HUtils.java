@@ -9,9 +9,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,12 +20,14 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
+import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.IOUtils;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.SequenceFile.Reader;
 import org.apache.hadoop.io.SequenceFile.Writer;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobStatus;
 import org.apache.hadoop.util.ReflectionUtils;
@@ -43,15 +45,37 @@ public class HUtils {
 
 	public static final double VERYSMALL=0.00000000000000000000000000001;
 	
-	public static final String DEFAULTFS="hdfs://node101:8020";
+//	private static final String DEFAULTFS="hdfs://node101:8020";
 	
-	public static final String LOCALDENSITYOUTPUT="/user/root/iris_localdensity";
-	public static final String DELTADISTANCEOUTPUT="/user/root/iris_deltadistance";
-	public static final String FIRSTCENTERPATH="/user/root/iris_center/iter_0/clustered/part-m-00000";
-	public static final String FIRSTUNCLUSTEREDPATH="/user/root/iris_center/iter_0/unclustered";
-	public static final String CENTERPATH="/user/root/iris_center";
+	// pre filter
+	// 最原始user.xml文件
+	public static final String SOURCEFILE="/user/root/_source/source_users.xml";
+	// 过滤文件夹
+	public static final String FILTER="/user/root/_filter";
+	public static final String FILTER_DEDUPLICATE=FILTER+"/"+"deduplicate";
+	public static final String FILTER_GETATTRIBUTES=FILTER+"/"+"getattributes";
+	public static final String FILTER_GETMAXMIN=FILTER+"/"+"getmaxmin";
+	public static final String FILTER_FINDINITDC=FILTER+"/"+"findinitdc";
+	public static final String FILTER_NORMALIZATION=FILTER+"/"+"normalization";
 	
-	public static final String CENTERPATHPREFIX="/user/root/iris_center/iter_";
+	
+	
+	public static final String MAP_COUNTER="MAP_COUNTER";
+	public static final String REDUCE_COUNTER="REDUCE_COUNTER";
+	public static final String REDUCE_COUNTER2="REDUCE_COUNTER2";
+	
+	
+	public static double DELTA_DC=0.0;// DC阈值，
+	public static long INPUT_RECORDS=0L;// 文件全部记录数，任务FindInitDCJob任务后对此值进行赋值
+	
+	// fast cluster
+	public static final String LOCALDENSITYOUTPUT="/user/root/_localdensity";
+	public static final String DELTADISTANCEOUTPUT="/user/root/_deltadistance";
+	public static final String FIRSTCENTERPATH="/user/root/_center/iter_0/clustered/part-m-00000";
+	public static final String FIRSTUNCLUSTEREDPATH="/user/root/_center/iter_0/unclustered";
+	public static final String CENTERPATH="/user/root/_center";
+	
+	public static final String CENTERPATHPREFIX="/user/root/_center/iter_";
 	
 	
 	private static Configuration conf = null;
@@ -122,19 +146,9 @@ public class HUtils {
 		List<CurrentJobInfo> jsList= new ArrayList<CurrentJobInfo>();
 		jsList.clear();
 		for(JobStatus js: jss){
-//			long currTime = System.currentTimeMillis();
-//			System.out.println("curr:"+currTime);
-//			System.out.println("curr:"+new java.util.Date(currTime));
-//			System.out.println("millions:"+js.getStartTime());
-//			System.out.println("date:"+new java.util.Date(js.getStartTime()));
 			if(js.getStartTime()>jobStartTime){
 				jsList.add(new CurrentJobInfo(getJobClient().getJob(js.getJobID()),js.getStartTime(),js.getRunState()));
 			}
-//			if(jsList.size()<HUtils.JOBNUM){// 返回空的任务信息
-//				for(int i=jsList.size();i<HUtils.JOBNUM;i++){
-//					jsList.add(new CurrentJobInfo());
-//				}
-//			}
 		}
 		Collections.sort(jsList);
 		return jsList;
@@ -195,9 +209,14 @@ public class HUtils {
 		return "running";
 	}
 	
-	
+	/**
+	 * 返回HDFS路径
+	 * @param url
+	 * @return
+	 */
 	public static String getHDFSPath(String url){
-		return DEFAULTFS+url;
+		
+		return Utils.getKey("fs.defaultFS",flag)+url;
 	}
 	
 	/**
@@ -214,8 +233,145 @@ public class HUtils {
 		return Math.sqrt(error);
 	}
 	
-	
+	/**
+	 * 上传本地文件到HFDS
+	 * @param localPath
+	 * @param hdfsPath
+	 * @return
+	 */
+	public static Map<String,Object> upload(String localPath,String hdfsPath){
+		Map<String,Object> ret= new HashMap<String,Object>();
+		FileSystem fs = getFs();
+		Path src = new Path(localPath);
+		Path dst = new Path(hdfsPath);
+		try{
+			fs.copyFromLocalFile(src, dst);
+		}catch(Exception e){
+			ret.put("flag", "false");
+			ret.put("msg", e.getMessage());
+			e.printStackTrace();
+			return ret;
+		}
+		ret.put("flag", "true");
+		return ret;
+	}
+	/**
+	 * 删除HFDS文件或者文件夹
+	 * @param hdfsFolder
+	 * @return
+	 */
+	public static boolean delete(String hdfsFolder){
+		return false;
+	}
 
+	/**
+	 * 下载文件 
+	 * @param hdfsPath
+	 * @param localPath,本地文件夹
+	 * @return
+	 */
+	public static Map<String,Object> downLoad(String hdfsPath,String localPath){
+		
+		Map<String,Object> ret= new HashMap<String,Object>();
+		FileSystem fs = getFs();
+		Path src = new Path(hdfsPath);
+		Path dst = new Path(localPath);
+		try{
+//			fs.copyFromLocalFile(src, dst);
+			RemoteIterator<LocatedFileStatus> fss = fs.listFiles(src, true);
+			int i=0;
+			while(fss.hasNext()){
+				LocatedFileStatus file = fss.next();
+				if(file.isFile()&&file.toString().contains("part")){
+					fs.copyToLocalFile(file.getPath(), new Path(dst,"hdfs_"+i));
+				}
+			}
+		}catch(Exception e){
+			ret.put("flag", "false");
+			ret.put("msg", e.getMessage());
+			return ret;
+		}
+		ret.put("flag", "true");
+		return ret;
+	}
+	/**
+	 * 移动文件 
+	 * @param hdfsPath
+	 * @param desHdfsPath
+	 * @return
+	 */
+	public static boolean mv(String hdfsPath,String desHdfsPath){
+		
+		return false;
+	}
+	
+	
+	
+	
+	
+	/**
+	 * 更新最小值
+	 * @param key
+	 * @param min_2
+	 */
+	public static  void updateMin(DoubleArrWritable key,DoubleArrWritable min_1,int column) {
+		for(int i=0;i<column;i++){
+			if(key.getDoubleArr()[i]<min_1.getDoubleArr()[i]){
+				min_1.getDoubleArr()[i]=key.getDoubleArr()[i];// 直接赋值
+			}
+		}
+	}
+
+	/**
+	 * 更新最大值
+	 * @param key
+	 * @param max_2
+	 */
+	public static void updateMax(DoubleArrWritable key,DoubleArrWritable max_1,int column) {
+		for(int i=0;i<column;i++){
+			if(key.getDoubleArr()[i]>max_1.getDoubleArr()[i]){
+				max_1.getDoubleArr()[i]=key.getDoubleArr()[i];// 直接赋值
+			}
+		}
+	}
+	
+	/**
+	 * 根据给定的阈值百分比返回阈值
+	 * 
+	 * @param percent 一般为1~2% 
+	 * @return
+	 */
+	public static double findInitDC(double percent){
+		Path input =new Path( HUtils.getHDFSPath(HUtils.FILTER_FINDINITDC+"/part-r-00000"));
+		Configuration conf = HUtils.getConf();
+		SequenceFile.Reader reader = null;
+		long counter=0;
+		long percent_=(long) (percent*HUtils.INPUT_RECORDS);
+		try {
+			counter++;
+			reader = new SequenceFile.Reader(conf, Reader.file(input),
+					Reader.bufferSize(4096), Reader.start(0));
+			DoubleWritable dkey = (DoubleWritable) ReflectionUtils.newInstance(
+					reader.getKeyClass(), conf);
+			Writable dvalue = (Writable) ReflectionUtils.newInstance(
+					reader.getValueClass(), conf);
+
+			while (reader.next(dkey, dvalue)) {// 循环读取文件
+				if(counter>=percent_){
+					HUtils.DELTA_DC=dkey.get();
+					break;
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			IOUtils.closeStream(reader);
+		}
+		
+		return HUtils.DELTA_DC;
+	}
+	
+	
 	/**
 	 * @param value
 	 * @return
@@ -254,7 +410,7 @@ public class HUtils {
 		Configuration conf = HUtils.getConf();
 	    InputStream in =null;  
         try {  
-        	FileSystem fs = FileSystem.get(URI.create(input), conf);  
+        	FileSystem fs = getFs();  
         	in = fs.open(path);  
         	BufferedReader read = new BufferedReader(new InputStreamReader(in));  
             String line=null;  
@@ -399,17 +555,22 @@ public class HUtils {
 			}
 		}
 	}
-	
+	/**
+	 * 读取HDFS文件并写入本地
+	 * @param url
+	 * @param localPath
+	 */
 	public static void readHDFSFile(String url,String localPath){
 		Path path = new Path(url);
-		Configuration conf = HUtils.getConf();
+//		Configuration conf = HUtils.getConf();
 		FileWriter writer =null;
 		BufferedWriter bw =null;
 		 InputStream in =null;  
 		try {
 			writer = new FileWriter(localPath);
 	        bw = new BufferedWriter(writer);
-	        FileSystem fs = FileSystem.get(URI.create(url), conf);  
+//	        FileSystem fs = FileSystem.get(URI.create(url), conf);  
+	        FileSystem fs = getFs();
         	in = fs.open(path);  
         	BufferedReader read = new BufferedReader(new InputStreamReader(in));  
             String line=null;  
@@ -434,6 +595,7 @@ public class HUtils {
 	}
 	/**
 	 * read center to local file
+	 * 读取中心点文件到本地
 	 * @param iter_i
 	 * @param localPath
 	 */
@@ -443,7 +605,8 @@ public class HUtils {
 		FileWriter writer =null;
 		BufferedWriter bw =null;
 		try{
-		fs = FileSystem.get(getConf());
+//		fs = FileSystem.get(getConf());
+		fs= getFs();
 		// read all before center files 
 		String parentFolder =null;
 		Path path =null;
@@ -488,6 +651,11 @@ public class HUtils {
 		}
 	}
 	
+	/**
+	 * double数组转为字符串
+	 * @param d
+	 * @return
+	 */
 	public static String doubleArr2Str(double[] d){
 		StringBuffer buff = new StringBuffer();
 		
@@ -496,6 +664,11 @@ public class HUtils {
 		}
 		return buff.substring(0, buff.length()-1);
 	}
+	/**
+	 * int 数组转为字符串
+	 * @param d
+	 * @return
+	 */
 	public static String intArr2Str(int[] d){
 		StringBuffer buff = new StringBuffer();
 		

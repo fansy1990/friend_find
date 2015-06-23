@@ -19,6 +19,8 @@ public class DoubleArrWritable implements WritableComparable<DoubleArrWritable>{
 	private double[] doubleArr;
 	private int len;
 	
+	private String identifier;
+	
 	public DoubleArrWritable(){}
 	
 	public DoubleArrWritable(double[] doubleArr){
@@ -26,7 +28,14 @@ public class DoubleArrWritable implements WritableComparable<DoubleArrWritable>{
 		this.doubleArr=doubleArr;
 	}
 	
+	public DoubleArrWritable(double[] doubleArr,String identifier){
+		this.len=doubleArr.length;  
+		this.doubleArr=doubleArr;
+		this.identifier=identifier;
+	}
+	
 	public void write(DataOutput out) throws IOException {
+		out.writeUTF(identifier);
 		out.writeInt(len);  
         for(int i=0;i<doubleArr.length;i++){  
             out.writeDouble(doubleArr[i]);  
@@ -34,6 +43,7 @@ public class DoubleArrWritable implements WritableComparable<DoubleArrWritable>{
 	}
 
 	public void readFields(DataInput in) throws IOException {
+		identifier=in.readUTF();
 		len = in.readInt();  
         doubleArr = new double[len];  
         for(int i=0;i<len;i++){  
@@ -81,8 +91,22 @@ public class DoubleArrWritable implements WritableComparable<DoubleArrWritable>{
 		for(int i=0;i<len;i++){
 			buff.append(doubleArr[i]).append(",");
 		}
-		return buff.substring(0, buff.length()-1)+"]";
+		return this.identifier+"\t"+buff.substring(0, buff.length()-1)+"]";
 		
+	}
+
+	/**
+	 * @return the identifier
+	 */
+	public String getIdentifier() {
+		return identifier;
+	}
+
+	/**
+	 * @param identifier the identifier to set
+	 */
+	public void setIdentifier(String identifier) {
+		this.identifier = identifier;
 	}
 	
 }

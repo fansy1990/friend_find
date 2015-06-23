@@ -44,19 +44,64 @@
 		}]
 	},{
 		"id":12,
-		"text":"聚类算法",
+		"text":"预处理",
 		"attributes":{
 				"folder":"1"
 		},
 		"children":[{
 			"id":121,
+			"text":"文件上传",
+			"attributes":{
+				"folder":"0",
+				"url":"preprocess/upload.jsp"
+			}
+		},{
+			"id":1220,
+			"text":"文件去重",
+			"attributes":{
+				"folder":"0",
+				"url":"preprocess/deduplicate.jsp"
+			}
+			
+		},{
+			"id":122,
+			"text":"文件下载",
+			"attributes":{
+				"folder":"0",
+				"url":"preprocess/download.jsp"
+			}
+			
+		},{
+			"id":123,
+			"text":"数据入库",
+			"attributes":{
+				"folder":"0",
+				"url":"preprocess/in2db.jsp"
+			}
+		},{
+			"id":124,
+			"text":"数据解析到HDFS",
+			"checked":true,
+			"attributes":{
+				"folder":"0",
+				"url":"preprocess/in2hdfs.jsp"
+			}
+		}]
+	},{
+		"id":13,
+		"text":"聚类算法",
+		"attributes":{
+				"folder":"1"
+		},
+		"children":[{
+			"id":131,
 			"text":"执行聚类",
 			"attributes":{
 				"folder":"0",
 				"url":"cluster/runCluster1.jsp"
 			}
 		},{
-			"id":122,
+			"id":132,
 			"text":"画决策图",
 			"attributes":{
 				"folder":"0",
@@ -64,14 +109,14 @@
 			}
 			
 		},{
-			"id":123,
+			"id":133,
 			"text":"执行分类",
 			"attributes":{
 				"folder":"0",
 				"url":""
 			}
 		},{
-			"id":124,
+			"id":134,
 			"text":"Games",
 			"checked":true,
 			"attributes":{
@@ -80,20 +125,20 @@
 			}
 		}]
 	},{
-		"id":13,
+		"id":14,
 		"text":"图表展示",
 		"attributes":{
 				"folder":"1"
 		},
 		"children":[{
-			"id":131,
+			"id":141,
 			"text":"聚类中心",
 			"attributes":{
 				"folder":"0",
 				"url":""
 			}
 		},{
-			"id":132,
+			"id":142,
 			"text":"聚类群组",
 			"attributes":{
 				"folder":"0",
@@ -102,14 +147,14 @@
 			
 		}]
 	},{
-		"id":14,
+		"id":15,
 		"text":"about.html",
 		"attributes":{
 				"folder":"0",
 				"url":"about.html"
 			}
 	},{
-		"id":15,
+		"id":16,
 		"text":"welcome.html",
 		"attributes":{
 				"folder":"0",

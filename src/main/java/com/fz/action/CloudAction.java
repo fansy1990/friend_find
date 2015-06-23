@@ -33,10 +33,13 @@ public class CloudAction extends ActionSupport {
 	private String delta;
 	private String method;
 	
+	private String output;
+	
 	/**
 	 * 提交fast cluster第一步MR任务
 	 */
 	public void runCluster1(){	
+		Map<String ,Object> map = new HashMap<String,Object>();
 		try {
 			//提交一个Hadoop MR任务的基本流程
 			// 1. 设置提交时间阈值,并设置这组job的个数
@@ -46,10 +49,34 @@ public class CloudAction extends ActionSupport {
 			// 2. 使用Thread的方式启动一组MR任务
 			new Thread(new RunCluster1(input, splitter, delta, method)).start();
 			// 3. 启动成功后，直接返回到监控，同时监控定时向后台获取数据，并在前台展示；
-			Utils.write2PrintWriter("monitor");
+			
+			map.put("flag", "true");
 		} catch (Exception e) {
 			e.printStackTrace();
+			map.put("flag", "false");
+			map.put("msg", e.getMessage());
 		}
+		Utils.write2PrintWriter(JSON.toJSONString(map));
+	}
+	
+	/**
+	 * 去重任务提交
+	 */
+	public void deduplicate(){
+		Map<String ,Object> map = new HashMap<String,Object>();
+		try{
+			HUtils.setJobStartTime(System.currentTimeMillis()-10000);
+			HUtils.JOBNUM=1;
+			new Thread(new Deduplicate(input,output)).start();
+			map.put("flag", "true");
+			map.put("monitor", "true");
+		} catch (Exception e) {
+			e.printStackTrace();
+			map.put("flag", "false");
+			map.put("monitor", "false");
+			map.put("msg", e.getMessage());
+		}
+		Utils.write2PrintWriter(JSON.toJSONString(map));
 	}
 	
 	/**
@@ -126,6 +153,81 @@ public class CloudAction extends ActionSupport {
     	return ;
     }
 
+	/**
+	 * 单个任务监控
+	 * @throws IOException
+	 */
+	public void monitorone() throws IOException{
+    	Map<String ,Object> jsonMap = new HashMap<String,Object>();
+    	List<CurrentJobInfo> currJobList =null;
+    	try{
+    		currJobList= HUtils.getJobs();
+//    		jsonMap.put("rows", currJobList);// 放入数据
+    		jsonMap.put("jobnums", HUtils.JOBNUM);
+    		// 任务完成的标识是获取的任务个数必须等于jobNum，同时最后一个job完成
+    		// true 所有任务完成
+    		// false 任务正在运行
+    		// error 某一个任务运行失败，则不再监控
+    		
+    		if(currJobList.size()>=HUtils.JOBNUM){// 如果返回的list有JOBNUM个，那么才可能完成任务
+    			if("success".equals(HUtils.hasFinished(currJobList.get(currJobList.size()-1)))){
+    				jsonMap.put("finished", "true");
+    				// 运行完成，初始化时间点
+    				HUtils.setJobStartTime(System.currentTimeMillis());
+    			}else if("running".equals(HUtils.hasFinished(currJobList.get(currJobList.size()-1)))){
+    				jsonMap.put("finished", "false");
+    			}else{// fail 或者kill则设置为error
+    				jsonMap.put("finished", "error");
+    				HUtils.setJobStartTime(System.currentTimeMillis());
+    			}
+    		}else if(currJobList.size()>0){
+    			if("fail".equals(HUtils.hasFinished(currJobList.get(currJobList.size()-1)))||
+    					"kill".equals(HUtils.hasFinished(currJobList.get(currJobList.size()-1)))){
+    				jsonMap.put("finished", "error");
+    				HUtils.setJobStartTime(System.currentTimeMillis());
+    			}else{
+    				jsonMap.put("finished", "false");
+    			}
+        	}
+    		jsonMap.put("rows", currJobList.get(currJobList.size()-1));
+    		jsonMap.put("currjob", currJobList.size());
+    		if(currJobList.size()==0){
+    			jsonMap.put("finished", "false");
+    			jsonMap.put("currjob", 0);
+//    			return ;
+    		}
+    	}catch(Exception e){
+    		e.printStackTrace();
+    		jsonMap.put("finished", "error");
+    		HUtils.setJobStartTime(System.currentTimeMillis());
+    	}
+    	System.out.println(new java.util.Date()+":"+JSON.toJSONString(jsonMap));
+    	
+    	Utils.write2PrintWriter(JSON.toJSONString(jsonMap));// 使用JSON数据传输
+    	
+    	return ;
+    }
+
+	
+	
+	/**
+	 * 上传文件
+	 */
+	public void upload(){
+		Map<String,Object> map = HUtils.upload(input, HUtils.getHDFSPath(HUtils.SOURCEFILE));
+		
+		Utils.write2PrintWriter(JSON.toJSONString(map));
+		return ;
+	}
+	/**
+	 * 下载文件到本地文件夹
+	 */
+	public void download(){
+		Map<String,Object> map = HUtils.downLoad(HUtils.getHDFSPath(HUtils.FILTER_DEDUPLICATE), input);
+		
+		Utils.write2PrintWriter(JSON.toJSONString(map));
+		return ;
+	}
 
 	public String getInput() {
 		return input;
@@ -165,6 +267,20 @@ public class CloudAction extends ActionSupport {
 
 	public void setMethod(String method) {
 		this.method = method;
+	}
+
+	/**
+	 * @return the output
+	 */
+	public String getOutput() {
+		return output;
+	}
+
+	/**
+	 * @param output the output to set
+	 */
+	public void setOutput(String output) {
+		this.output = output;
 	}
 
 
