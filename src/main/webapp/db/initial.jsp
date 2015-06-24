@@ -26,7 +26,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		<br> <select id="cc" class="easyui-combobox" name="dept"
 			style="width:200px;">
 			<option value="LoginUser">用户登录表</option>
-			<option value="UserData">用户数据表</option>
+			<option value="UserData">用户数据表(不要使用此功能)</option>
 			<option value="HConstants">集群配置表</option>
 
 		</select> 

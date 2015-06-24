@@ -199,6 +199,32 @@ public class DBService {
 		return true;
 	}
 	
+	/**
+	 * 批量插入xmlPath数据
+	 * @param xmlPath
+	 * @return
+	 */
+	public Map<String,Object> insertUserData(String xmlPath){
+		Map<String,Object> map = new HashMap<String,Object>();
+		try{
+			baseDao.executeHql("delete UserData");
+			List<String[]> strings= Utils.parseXml2StrArr(xmlPath);
+			List<Object> uds = new ArrayList<Object>();
+			for(String[] s:strings){
+				uds.add(new UserData(s));
+			}
+			int ret =baseDao.saveBatch(uds);
+			log.info("用户表批量插入了{}条记录!",ret);
+		}catch(Exception e){
+			e.printStackTrace();
+			map.put("flag", "false");
+			map.put("msg", e.getMessage());
+			return map;
+		}
+		map.put("flag", "true");
+		return map;
+	}
+	
 	public boolean insertUserData_b(){
 		try{
 			baseDao.executeHql("delete UserData");

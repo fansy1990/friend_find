@@ -8,8 +8,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Component;
+
 import com.alibaba.fastjson.JSON;
 import com.fz.model.CurrentJobInfo;
+import com.fz.service.DBService;
 import com.fz.thread.RunCluster1;
 import com.fz.util.DrawPic;
 import com.fz.util.HUtils;
@@ -21,6 +26,7 @@ import com.opensymphony.xwork2.ActionSupport;
  * @author fansy
  * @date 2015-6-16
  */
+@Component("cloudAction")
 public class CloudAction extends ActionSupport {
 
 	/**
@@ -34,6 +40,10 @@ public class CloudAction extends ActionSupport {
 	private String method;
 	
 	private String output;
+	
+	
+	@Resource
+	private DBService dBService;
 	
 	/**
 	 * 提交fast cluster第一步MR任务
@@ -223,8 +233,18 @@ public class CloudAction extends ActionSupport {
 	 * 下载文件到本地文件夹
 	 */
 	public void download(){
-		Map<String,Object> map = HUtils.downLoad(HUtils.getHDFSPath(HUtils.FILTER_DEDUPLICATE), input);
+		// output 应该和HUtils.DEDUPLICATE_LOCAL保持一致
 		
+		Map<String,Object> map = HUtils.downLoad(input, Utils.getRootPathBasedPath(output));
+		
+		Utils.write2PrintWriter(JSON.toJSONString(map));
+		return ;
+	}
+	/**
+	 * 解析入库
+	 */
+	public void resolve2db(){
+		Map<String,Object> map=dBService.insertUserData(input);
 		Utils.write2PrintWriter(JSON.toJSONString(map));
 		return ;
 	}
@@ -281,6 +301,20 @@ public class CloudAction extends ActionSupport {
 	 */
 	public void setOutput(String output) {
 		this.output = output;
+	}
+
+	/**
+	 * @return the dBService
+	 */
+	public DBService getdBService() {
+		return dBService;
+	}
+
+	/**
+	 * @param dBService the dBService to set
+	 */
+	public void setdBService(DBService dBService) {
+		this.dBService = dBService;
 	}
 
 

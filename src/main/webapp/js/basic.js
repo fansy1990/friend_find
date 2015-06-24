@@ -30,6 +30,7 @@ function callByAJax(url,data_){
 //			$.messager.progress('close');
 			closeProgressbar();
 			console.info("data.flag:"+data.flag);
+			var retMsg;
 			if("true"==data.flag){
 				retMsg='操作成功！';
 			}else{
@@ -39,6 +40,7 @@ function callByAJax(url,data_){
 				title : '提示',
 				msg : retMsg
 			});
+			
 			if("true"==data.flag&&"true"==data.monitor){// 添加监控页面
 				// 使用单独Tab的方式
 				layout_center_addTabFun({
@@ -48,6 +50,7 @@ function callByAJax(url,data_){
 					href : 'cluster/monitor_one.jsp'
 				});
 			}
+			
 		}
 	});
 }
@@ -59,6 +62,7 @@ function layout_center_addTabFun(opts) {
 		} else {
 			t.tabs('add', opts);
 		}
+		console.info("打开页面："+opts.title);
 }
 
 $(function(){

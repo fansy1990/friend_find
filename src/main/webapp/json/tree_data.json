@@ -76,12 +76,11 @@
 			"text":"数据入库",
 			"attributes":{
 				"folder":"0",
-				"url":"preprocess/in2db.jsp"
+				"url":"preprocess/resolve2db.jsp"
 			}
 		},{
 			"id":124,
 			"text":"数据解析到HDFS",
-			"checked":true,
 			"attributes":{
 				"folder":"0",
 				"url":"preprocess/in2hdfs.jsp"

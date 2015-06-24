@@ -5,4 +5,5 @@ Friend Find 系统
 功能1--过滤
    1. 上传users.xml文件到HDFS；
    2. 运行DeduplicateJob任务，并监控；
-   3. 
+   3. 下载HDFS中去重后的记录到本地文件WEB-INF/classes/deduplicate_users.xml；
+   4. 把WEB-INF/classes/deduplicate_users.xml文件导入到数据库中;

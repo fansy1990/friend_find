@@ -53,12 +53,13 @@ public class HUtils {
 	// 过滤文件夹
 	public static final String FILTER="/user/root/_filter";
 	public static final String FILTER_DEDUPLICATE=FILTER+"/"+"deduplicate";
+	
 	public static final String FILTER_GETATTRIBUTES=FILTER+"/"+"getattributes";
 	public static final String FILTER_GETMAXMIN=FILTER+"/"+"getmaxmin";
 	public static final String FILTER_FINDINITDC=FILTER+"/"+"findinitdc";
 	public static final String FILTER_NORMALIZATION=FILTER+"/"+"normalization";
 	
-	
+	public static final String DEDUPLICATE_LOCAL="WEB-INF/classes/deduplicate_users.xml";
 	
 	public static final String MAP_COUNTER="MAP_COUNTER";
 	public static final String REDUCE_COUNTER="REDUCE_COUNTER";
@@ -283,12 +284,15 @@ public class HUtils {
 			while(fss.hasNext()){
 				LocatedFileStatus file = fss.next();
 				if(file.isFile()&&file.toString().contains("part")){
-					fs.copyToLocalFile(file.getPath(), new Path(dst,"hdfs_"+i));
+					// 使用这个才能下载成功
+					fs.copyToLocalFile(false,file.getPath(), new Path(dst,"hdfs_"+i++),true);
+//					fs.moveToLocalFile(file.getPath(), new Path(dst,"hdfs_"+i++));
 				}
 			}
 		}catch(Exception e){
 			ret.put("flag", "false");
 			ret.put("msg", e.getMessage());
+			e.printStackTrace();
 			return ret;
 		}
 		ret.put("flag", "true");
