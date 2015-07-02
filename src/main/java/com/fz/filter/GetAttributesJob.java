@@ -14,7 +14,7 @@ import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.hadoop.util.Tool;
 
-import com.fz.fast_cluster.keytype.DoubleArrWritable;
+import com.fz.fast_cluster.keytype.DoubleArrStrWritable;
 import com.fz.filter.mr.GetAttributesMapper;
 import com.fz.util.HUtils;
 
@@ -41,10 +41,10 @@ public class GetAttributesJob extends Configured implements Tool {
 //	    job.setReducerClass(DeduplicateReducer.class);
 	    job.setNumReduceTasks(0);
 	    
-	    job.setOutputKeyClass(DoubleArrWritable.class);
+	    job.setOutputKeyClass(DoubleArrStrWritable.class);
 	    job.setOutputValueClass(NullWritable.class);
 	    
-//	    job.setOutputFormatClass(SequenceFileOutputFormat.class);
+	    job.setOutputFormatClass(SequenceFileOutputFormat.class);
 	    FileInputFormat.addInputPath(job, new Path(otherArgs[0]));
 	    SequenceFileOutputFormat.setOutputPath(job,new Path(otherArgs[1]));
 	    FileSystem.get(conf).delete(new Path(otherArgs[1]), true);

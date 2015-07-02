@@ -14,7 +14,7 @@ import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.hadoop.util.Tool;
 
-import com.fz.fast_cluster.keytype.DoubleArrWritable;
+import com.fz.fast_cluster.keytype.DoubleArrStrWritable;
 import com.fz.filter.mr.NormalizationMapper;
 import com.fz.util.HUtils;
 
@@ -45,10 +45,11 @@ public class NormalizationJob extends Configured implements Tool {
 //	    job.setMapOutputKeyClass(DoubleArrWritable.class	);
 //	    job.setMapOutputValueClass(NullWritable.class);
 	    
-	    job.setOutputKeyClass(DoubleArrWritable.class);
+	    job.setOutputKeyClass(DoubleArrStrWritable.class);
 	    job.setOutputValueClass(NullWritable.class);
 	    
 	    job.setOutputFormatClass(SequenceFileOutputFormat.class);
+	    job.setInputFormatClass(SequenceFileInputFormat.class);
 	    SequenceFileInputFormat.addInputPath(job, new Path(otherArgs[0]));
 	    SequenceFileOutputFormat.setOutputPath(job,new Path(otherArgs[1]));
 	    FileSystem.get(conf).delete(new Path(otherArgs[1]), true);

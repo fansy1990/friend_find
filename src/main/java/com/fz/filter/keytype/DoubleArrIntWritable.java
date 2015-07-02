@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.fz.fast_cluster.keytype;
+package com.fz.filter.keytype;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -12,30 +12,30 @@ import org.apache.hadoop.io.WritableComparable;
 /**
  * double array writable key type
  * @author fansy
- * @date 2015-5-28
+ * @date 2015-6-26
  */
-public class DoubleArrWritable implements WritableComparable<DoubleArrWritable>{
+public class DoubleArrIntWritable implements WritableComparable<DoubleArrIntWritable>{
 
 	private double[] doubleArr;
 	private int len;
 	
-	private String identifier;
+	private int identifier;
 	
-	public DoubleArrWritable(){}
+	public DoubleArrIntWritable(){}
 	
-	public DoubleArrWritable(double[] doubleArr){
+	public DoubleArrIntWritable(double[] doubleArr){
 		this.len=doubleArr.length;  
 		this.doubleArr=doubleArr;
 	}
 	
-	public DoubleArrWritable(double[] doubleArr,String identifier){
+	public DoubleArrIntWritable(double[] doubleArr,int identifier){
 		this.len=doubleArr.length;  
 		this.doubleArr=doubleArr;
 		this.identifier=identifier;
 	}
 	
 	public void write(DataOutput out) throws IOException {
-		out.writeUTF(identifier);
+		out.writeInt(identifier);
 		out.writeInt(len);  
         for(int i=0;i<doubleArr.length;i++){  
             out.writeDouble(doubleArr[i]);  
@@ -43,7 +43,7 @@ public class DoubleArrWritable implements WritableComparable<DoubleArrWritable>{
 	}
 
 	public void readFields(DataInput in) throws IOException {
-		identifier=in.readUTF();
+		identifier=in.readInt();
 		len = in.readInt();  
         doubleArr = new double[len];  
         for(int i=0;i<len;i++){  
@@ -51,7 +51,7 @@ public class DoubleArrWritable implements WritableComparable<DoubleArrWritable>{
         }  
 	}
 
-	public int compareTo(DoubleArrWritable o) {
+	public int compareTo(DoubleArrIntWritable o) {
 		double[] oDistance =o.doubleArr;  
         int cmp=0;  
         for(int i=0;i<oDistance.length;i++){  
@@ -98,14 +98,14 @@ public class DoubleArrWritable implements WritableComparable<DoubleArrWritable>{
 	/**
 	 * @return the identifier
 	 */
-	public String getIdentifier() {
+	public int getIdentifier() {
 		return identifier;
 	}
 
 	/**
 	 * @param identifier the identifier to set
 	 */
-	public void setIdentifier(String identifier) {
+	public void setIdentifier(int identifier) {
 		this.identifier = identifier;
 	}
 	

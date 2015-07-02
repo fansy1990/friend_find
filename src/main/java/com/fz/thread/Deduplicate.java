@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.fz.action;
+package com.fz.thread;
 
 import org.apache.hadoop.util.ToolRunner;
 

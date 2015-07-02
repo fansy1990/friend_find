@@ -76,6 +76,21 @@ public class DBService {
 		}
 		return false;
 	}
+	/**
+	 * 获得tableName的所有数据并返回
+	 * @param tableName
+	 * @return
+	 */
+	public List<Object> getTableAllData(String tableName){
+		String hql ="from "+tableName+" ";
+		List<Object> list = null;
+		try{
+			list=baseDao.find(hql);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return list;
+	}
 	
 	/**
 	 * 分页获取tableName 所有数据
@@ -132,11 +147,16 @@ public class DBService {
 	 * @return
 	 */
 	public String getHConstValue(String key){
-		
-		HConstants hc = (HConstants) baseDao.find("from HConstants hc where hc.custKey='"+key+"'").get(0);
-		if(hc==null){
-			log.info("Hadoop基础配置表找不到配置的key：{}",key);
-			return null;
+		HConstants hc=null;
+		try{
+			 hc = (HConstants) baseDao.find("from HConstants hc where hc.custKey='"+key+"'").get(0);
+			if(hc==null){
+				log.info("Hadoop基础配置表找不到配置的key：{}",key);
+				return null;
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+			log.info("获取云平台配置信息出错，key："+key);
 		}
 		return hc.getCustValue();
 	}
@@ -208,7 +228,15 @@ public class DBService {
 		Map<String,Object> map = new HashMap<String,Object>();
 		try{
 			baseDao.executeHql("delete UserData");
-			List<String[]> strings= Utils.parseXml2StrArr(xmlPath);
+//			if(!Utils.changeDat2Xml(xmlPath)){
+//				map.put("flag", "false");
+//				map.put("msg", "HDFS文件转为xml失败");
+//				return map;
+//			}
+//			List<String[]> strings= Utils.parseXmlFolder2StrArr(xmlPath);
+			// ---解析不使用xml解析，直接使用定制解析即可
+			//---
+			List<String[]>strings = Utils.parseDatFolder2StrArr(xmlPath);
 			List<Object> uds = new ArrayList<Object>();
 			for(String[] s:strings){
 				uds.add(new UserData(s));

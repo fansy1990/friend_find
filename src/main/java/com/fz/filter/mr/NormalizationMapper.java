@@ -15,29 +15,28 @@ import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.util.ReflectionUtils;
 
-import com.fz.fast_cluster.keytype.DoubleArrWritable;
-import com.fz.util.HUtils;
+import com.fz.fast_cluster.keytype.DoubleArrStrWritable;
 
 /**
  * @author fansy
  * @date 2015-6-23
  */
 public class NormalizationMapper extends
-		Mapper<DoubleArrWritable, NullWritable, DoubleArrWritable, NullWritable> {
+		Mapper<DoubleArrStrWritable, NullWritable, DoubleArrStrWritable, NullWritable> {
 
 	private double[] max_;
 	private double[] min_;
 	
 	@Override
 	public void setup(Context cxt){
-		Path input =new Path( cxt.getConfiguration().get("MAX_MIN"));
+		Configuration conf = cxt.getConfiguration();
+		Path input =new Path( conf.get("MAX_MIN"));
 		
-		Configuration conf = HUtils.getConf();
 		SequenceFile.Reader reader = null;
 		try {
 			reader = new SequenceFile.Reader(conf, Reader.file(input),
 					Reader.bufferSize(4096), Reader.start(0));
-			DoubleArrWritable dkey = (DoubleArrWritable) ReflectionUtils.newInstance(
+			DoubleArrStrWritable dkey = (DoubleArrStrWritable) ReflectionUtils.newInstance(
 					reader.getKeyClass(), conf);
 			Writable dvalue = (Writable) ReflectionUtils.newInstance(
 					reader.getValueClass(), conf);
@@ -58,7 +57,7 @@ public class NormalizationMapper extends
 	}
 	
 	@Override
-	public void map(DoubleArrWritable key, NullWritable value,Context cxt)throws InterruptedException,IOException{
+	public void map(DoubleArrStrWritable key, NullWritable value,Context cxt)throws InterruptedException,IOException{
 		normalize(key);
 		cxt.write(key, value);
 	}
@@ -67,7 +66,7 @@ public class NormalizationMapper extends
 	 * 最大最小值归一化[0,1]
 	 * @param key
 	 */
-	private void normalize(DoubleArrWritable key) {
+	private void normalize(DoubleArrStrWritable key) {
 		for(int i=0;i<key.getDoubleArr().length;i++){
 			key.getDoubleArr()[i]=(key.getDoubleArr()[i]-min_[i])/(max_[i]-min_[i]);
 		}

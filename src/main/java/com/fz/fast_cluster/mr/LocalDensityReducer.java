@@ -8,7 +8,7 @@ import java.io.IOException;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.mapreduce.Reducer;
 
-import com.fz.fast_cluster.keytype.DoubleArrWritable;
+import com.fz.fast_cluster.keytype.DoubleArrStrWritable;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
 
@@ -19,11 +19,11 @@ import com.fz.fast_cluster.keytype.DoubleArrWritable;
  * @date 2015-6-1
  */
 public class LocalDensityReducer extends
-		Reducer<DoubleArrWritable, DoubleWritable, DoubleArrWritable, DoubleWritable> {
+		Reducer<DoubleArrStrWritable, DoubleWritable, DoubleArrStrWritable, DoubleWritable> {
 //	private Logger log = LoggerFactory.getLogger(LocalDensityReducer.class);
 	private DoubleWritable sumAll = new DoubleWritable();
 	@Override
-	public void reduce(DoubleArrWritable key, Iterable<DoubleWritable> values,Context cxt)
+	public void reduce(DoubleArrStrWritable key, Iterable<DoubleWritable> values,Context cxt)
 	throws IOException,InterruptedException{
 		double sum =0;
 		int i=0;

@@ -15,6 +15,9 @@ import org.springframework.stereotype.Component;
 import com.alibaba.fastjson.JSON;
 import com.fz.model.CurrentJobInfo;
 import com.fz.service.DBService;
+import com.fz.thread.CalDistance;
+import com.fz.thread.Deduplicate;
+import com.fz.thread.PreProcess;
 import com.fz.thread.RunCluster1;
 import com.fz.util.DrawPic;
 import com.fz.util.HUtils;
@@ -40,6 +43,8 @@ public class CloudAction extends ActionSupport {
 	private String method;
 	
 	private String output;
+	
+	private String record;
 	
 	
 	@Resource
@@ -108,6 +113,72 @@ public class CloudAction extends ActionSupport {
 		map.put("flag", "true");
 		Utils.write2PrintWriter(JSON.toJSONString(map));
 		return ;
+	}
+	/**
+	 * 数据库数据解析到云平台
+	 * [DoubleArrWritable,IntWritable]
+	 */
+	public void db2hdfs(){
+		List<Object> list = dBService.getTableAllData("UserData");
+		Map<String,Object> map = new HashMap<String,Object>();
+		if(list.size()==0){
+			map.put("flag", "false");
+			Utils.write2PrintWriter(JSON.toJSONString(map));
+			return ;
+		}
+		try{
+			HUtils.db2hdfs(list,output,Integer.parseInt(record));
+		}catch(Exception e){
+			map.put("flag", "false");
+			map.put("msg", e.getMessage());
+			Utils.write2PrintWriter(JSON.toJSONString(map));
+			return ;
+		}
+		map.put("flag", "true");
+		Utils.write2PrintWriter(JSON.toJSONString(map));
+		return ;
+	}
+	/**
+	 * 遍历向量距离文件，寻找最佳阈值
+	 */
+	public void findbestdc(){
+		double dc=0.0;
+		Map<String,Object> map = new HashMap<String,Object>();
+		try{
+			dc=HUtils.findInitDC(Double.parseDouble(delta.substring(0, delta.length()-1))/100, input, 
+					HUtils.INPUT_RECORDS);
+		}catch(Exception e){
+			e.printStackTrace();
+			map.put("flag", "false");
+			map.put("msg", e.getMessage());
+			Utils.write2PrintWriter(JSON.toJSONString(map));
+			return ;
+		}
+		map.put("flag", "true");
+		map.put("dc", dc);
+		Utils.simpleLog(JSON.toJSONString(map));
+		Utils.write2PrintWriter(JSON.toJSONString(map));
+		return;
+	}
+	
+	/**
+	 * 计算向量之间的距离
+	 */
+	public void caldistance(){
+		Map<String ,Object> map = new HashMap<String,Object>();
+		try{
+			HUtils.setJobStartTime(System.currentTimeMillis()-10000);
+			HUtils.JOBNUM=1;
+			new Thread(new CalDistance(input,output)).start();
+			map.put("flag", "true");
+			map.put("monitor", "true");
+		} catch (Exception e) {
+			e.printStackTrace();
+			map.put("flag", "false");
+			map.put("monitor", "false");
+			map.put("msg", e.getMessage());
+		}
+		Utils.write2PrintWriter(JSON.toJSONString(map));
 	}
 	
 	/**
@@ -199,13 +270,21 @@ public class CloudAction extends ActionSupport {
     				jsonMap.put("finished", "false");
     			}
         	}
-    		jsonMap.put("rows", currJobList.get(currJobList.size()-1));
-    		jsonMap.put("currjob", currJobList.size());
+    		
+    		
     		if(currJobList.size()==0){
     			jsonMap.put("finished", "false");
-    			jsonMap.put("currjob", 0);
 //    			return ;
+    		}else{
+    			if(jsonMap.get("finished").equals("error")){
+    				CurrentJobInfo cj =currJobList.get(currJobList.size()-1);
+    				cj.setRunState("Error!");
+    				jsonMap.put("rows", cj);
+    			}else{
+    				jsonMap.put("rows", currJobList.get(currJobList.size()-1));
+    			}
     		}
+    		jsonMap.put("currjob", currJobList.size());
     	}catch(Exception e){
     		e.printStackTrace();
     		jsonMap.put("finished", "error");
@@ -244,9 +323,28 @@ public class CloudAction extends ActionSupport {
 	 * 解析入库
 	 */
 	public void resolve2db(){
-		Map<String,Object> map=dBService.insertUserData(input);
+		Map<String,Object> map=dBService.insertUserData(Utils.getRootPathBasedPath(input));
 		Utils.write2PrintWriter(JSON.toJSONString(map));
 		return ;
+	}
+	/**
+	 * 预处理MR任务提交
+	 */
+	public void preprocess(){
+		Map<String ,Object> map = new HashMap<String,Object>();
+		try{
+			HUtils.setJobStartTime(System.currentTimeMillis()-10000);
+			HUtils.JOBNUM=4;// 预处理任务有4个MR任务
+			new Thread(new PreProcess(input,output,delta)).start();
+			map.put("flag", "true");
+			map.put("monitor", "true");
+		} catch (Exception e) {
+			e.printStackTrace();
+			map.put("flag", "false");
+			map.put("monitor", "false");
+			map.put("msg", e.getMessage());
+		}
+		Utils.write2PrintWriter(JSON.toJSONString(map));
 	}
 
 	public String getInput() {
@@ -315,6 +413,20 @@ public class CloudAction extends ActionSupport {
 	 */
 	public void setdBService(DBService dBService) {
 		this.dBService = dBService;
+	}
+
+	/**
+	 * @return the record
+	 */
+	public String getRecord() {
+		return record;
+	}
+
+	/**
+	 * @param record the record to set
+	 */
+	public void setRecord(String record) {
+		this.record = record;
 	}
 
 

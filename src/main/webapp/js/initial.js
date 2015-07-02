@@ -33,6 +33,12 @@ $(function(){
 		});
 	});
 	
+	// db2hdfs
+	$('#db2hdfsId').bind('click', function(){
+		popupProgressbar('请等待','数据库解析到云平台中...','1200');
+		callByAJax('cloud/cloud_db2hdfs.action',{});
+	});
+	// db2hdfs
 	
 	
 	// testid

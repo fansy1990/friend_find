@@ -10,7 +10,7 @@ import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
-import com.fz.fast_cluster.keytype.DoubleArrWritable;
+import com.fz.fast_cluster.keytype.DoubleArrStrWritable;
 import com.fz.util.Utils;
 
 /**
@@ -20,8 +20,8 @@ import com.fz.util.Utils;
  * @date 2015-6-23
  */
 public class GetAttributesMapper extends
-		Mapper<LongWritable, Text, DoubleArrWritable, NullWritable> {
-	private DoubleArrWritable attributes = null;
+		Mapper<LongWritable, Text, DoubleArrStrWritable, NullWritable> {
+	private DoubleArrStrWritable attributes = null;
 	private String emailHash_="EmailHash";
 	private String upVotes_="UpVotes";
 	private String downVotes_="DownVotes";
@@ -38,7 +38,7 @@ public class GetAttributesMapper extends
 		double reputation=getDouble(Utils.getAttrValInLine(value.toString(), reputation_));
 		
 		
-		attributes= new DoubleArrWritable(new double[]{reputation,upVotes,downVotes,views},emailHash);
+		attributes= new DoubleArrStrWritable(new double[]{reputation,upVotes,downVotes,views},emailHash);
 		cxt.write(attributes, NullWritable.get());
 	}
 	

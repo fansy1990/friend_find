@@ -80,10 +80,24 @@
 			}
 		},{
 			"id":124,
-			"text":"数据解析到HDFS",
+			"text":"DB过滤到HDFS",
 			"attributes":{
 				"folder":"0",
-				"url":"preprocess/in2hdfs.jsp"
+				"url":"preprocess/db2hdfs.jsp"
+			}
+		},{
+			"id":1240,
+			"text":"距离计算",
+			"attributes":{
+				"folder":"0",
+				"url":"preprocess/caldistance.jsp"
+			}
+		},{
+			"id":125,
+			"text":"最佳DC",
+			"attributes":{
+				"folder":"0",
+				"url":"preprocess/findbestdc.jsp"
 			}
 		}]
 	},{

@@ -4,7 +4,9 @@
 package com.fz.util;
 
 //import java.util.HashMap;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -49,6 +51,7 @@ public class Utils {
 	
 	private static String[] userdata_attributes=new String[]{"Id","Reputation","CreationDate","DisplayName",
 			"EmailHash","LastAccessDate","Location","Age","AboutMe","Views","UpVotes","DownVotes"};
+	public static String[] useful_attributes=new String[]{"reputations","upVotes","downVotes","views"};
 	private static String userdata_elementName="row";
 	private static String userdata_xmlPath="ask_ubuntu_users.xml";
 	
@@ -150,7 +153,54 @@ public class Utils {
 	public static String getRootPathBasedPath(String subPath){
 		return getRootPath()+subPath;
 	}
-	
+	/**
+	 * 把传入的xml文件夹的.xml文件解析为字符串数组
+	 * @param xmlFolder
+	 * @return
+	 */
+	public static List<String[]> parseXmlFolder2StrArr(String xmlFolder){
+		File folder = new File(xmlFolder);
+		List<String[]> list = new ArrayList<String[]>();
+		File[] files=null;
+		try{
+			files= folder.listFiles();
+			for(File f:files){
+				list.addAll(parseXml2StrArr(f.getAbsolutePath()));
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		return list;
+	}
+	/**
+	 * 把xmlFolder中以.dat为后缀的文件名到xml后缀
+	 * @param xmlFolder
+	 * @return
+	 */
+	public static boolean changeDat2Xml(String xmlFolder){
+		File folder = new File(xmlFolder);
+		File[] files=null;
+		String filename=null;
+		String newFilename=null;
+		File newFile =null;
+		try{
+			files= folder.listFiles();
+			for(File f:files){
+				filename=f.getAbsolutePath();
+				
+				if(filename.lastIndexOf(HUtils.DOWNLOAD_EXTENSION)!=-1){// 匹配文件,则进行转换
+					newFilename=filename.substring(0, filename.lastIndexOf(HUtils.DOWNLOAD_EXTENSION))+".xml";
+					newFile = new File(newFilename);
+					f.renameTo(newFile);
+				}
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
 	/**
 	 * 把xml转为字符串数组
 	 * @param xmlPath
@@ -236,7 +286,60 @@ public class Utils {
 		int end = line.indexOf("\"",start);
 		return line.substring(start, end);
 	}
+
+	/**
+	 * 定制解析
+	 * @param datFolder
+	 * @return
+	 */
+	public static List<String[]> parseDatFolder2StrArr(String datFolder) {
+		File folder = new File(datFolder);
+		List<String[]> list = new ArrayList<String[]>();
+		File[] files=null;
+		try{
+			files= folder.listFiles();
+			for(File f:files){
+				list.addAll(parseDat2StrArr(f.getAbsolutePath()));
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		return list;
+	}
 	
-	
+	/**
+	 * 定制解析单个dat文件
+	 * @param datFile
+	 * @return
+	 * @throws IOException 
+	 */
+	private static List<String[]> parseDat2StrArr(String datFile) throws IOException{
+		List<String[]> list = new ArrayList<String[]>();
+
+		 FileReader reader = new FileReader(datFile);
+         BufferedReader br = new BufferedReader(reader);
+        
+         String line = null;
+         String[] arr= null;
+         while((line = br.readLine()) != null) {
+        	 arr=new String[userdata_attributes.length];
+        	 for(int i=1;i<userdata_attributes.length;i++){
+        		 arr[i]=Utils.getAttrValInLine(line, userdata_attributes[i]);
+        	 }
+        	 list.add(arr);
+         }
+        
+         br.close();
+         reader.close();
+		return list;
+	}
+	/**
+	 * 简单日志
+	 * @param msg
+	 */
+	public static void simpleLog(String msg){
+		System.out.println(new java.util.Date()+":"+msg);
+	}
 	
 }

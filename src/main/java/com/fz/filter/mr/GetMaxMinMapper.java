@@ -9,19 +9,19 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.Mapper;
 
-import com.fz.fast_cluster.keytype.DoubleArrWritable;
+import com.fz.fast_cluster.keytype.DoubleArrStrWritable;
 import com.fz.util.HUtils;
 
 /**
  * @author fansy
  * @date 2015-6-23
  */
-public class GetMaxMinMapper extends Mapper<DoubleArrWritable,NullWritable,
-	IntWritable,DoubleArrWritable> {
+public class GetMaxMinMapper extends Mapper<DoubleArrStrWritable,NullWritable,
+	IntWritable,DoubleArrStrWritable> {
 
 	private int column;
-	private DoubleArrWritable min_=null;
-	private DoubleArrWritable max_ = null;
+	private DoubleArrStrWritable min_=null;
+	private DoubleArrStrWritable max_ = null;
 	
 	private IntWritable zero= new IntWritable(0);
 	private IntWritable one = new IntWritable(1);
@@ -33,19 +33,19 @@ public class GetMaxMinMapper extends Mapper<DoubleArrWritable,NullWritable,
 		for(int i=0;i<column;i++){
 			tmp_[i]=Double.MAX_VALUE;
 		}
-		min_=new DoubleArrWritable(tmp_,"min");
+		min_=new DoubleArrStrWritable(tmp_,"min");
 		
 		// 初始化max_,给tmp_赋最小值
 		tmp_= new double[column];
 		for(int i=0;i<column;i++){
 			tmp_[i]=Double.MIN_VALUE;
 		}
-		max_=new DoubleArrWritable(tmp_,"max");
+		max_=new DoubleArrStrWritable(tmp_,"max");
 		
 	} 
 	
 	@Override
-	public void map(DoubleArrWritable key, NullWritable value,Context cxt) {
+	public void map(DoubleArrStrWritable key, NullWritable value,Context cxt) {
 		HUtils.updateMax(key,max_,column);
 		HUtils.updateMin(key,min_,column);
 	}

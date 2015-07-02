@@ -15,7 +15,7 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
-import com.fz.fast_cluster.keytype.DoubleArrWritable;
+import com.fz.fast_cluster.keytype.DoubleArrStrWritable;
 import com.fz.util.HUtils;
 
 
@@ -23,7 +23,7 @@ import com.fz.util.HUtils;
  * @author fansy
  * @date 2015-5-28
  */
-public class LocalDensityMapper extends Mapper<LongWritable, Text, DoubleArrWritable, DoubleWritable> {
+public class LocalDensityMapper extends Mapper<LongWritable, Text, DoubleArrStrWritable, DoubleWritable> {
 
 	private double dc;
 	private Path input;
@@ -31,7 +31,7 @@ public class LocalDensityMapper extends Mapper<LongWritable, Text, DoubleArrWrit
 	private String method =null;
 	
 	private DoubleWritable sumAll= new DoubleWritable();
-	private DoubleArrWritable keyDoubleArr;
+	private DoubleArrStrWritable keyDoubleArr;
 	
 	@Override 
 	public void setup(Context cxt){
@@ -71,7 +71,7 @@ public class LocalDensityMapper extends Mapper<LongWritable, Text, DoubleArrWrit
 		// output if the point has at least one neighbor
 		if(sum>0){
 			sumAll.set(sum);
-			keyDoubleArr = new DoubleArrWritable(inputI);
+			keyDoubleArr = new DoubleArrStrWritable(inputI);
 			cxt.write(keyDoubleArr, sumAll);
 		}
 	}

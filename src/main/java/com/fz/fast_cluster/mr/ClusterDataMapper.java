@@ -20,7 +20,7 @@ import org.apache.hadoop.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fz.fast_cluster.keytype.DoubleArrWritable;
+import com.fz.fast_cluster.keytype.DoubleArrStrWritable;
 import com.fz.util.HUtils;
 
 
@@ -28,7 +28,7 @@ import com.fz.util.HUtils;
  * @author fansy
  * @date 2015-6-2
  */
-public class ClusterDataMapper extends Mapper<DoubleArrWritable, IntWritable, DoubleArrWritable, IntWritable> {
+public class ClusterDataMapper extends Mapper<DoubleArrStrWritable, IntWritable, DoubleArrStrWritable, IntWritable> {
 
 	private Logger log = LoggerFactory.getLogger(ClusterDataMapper.class);
 //	private String center = null;
@@ -36,10 +36,10 @@ public class ClusterDataMapper extends Mapper<DoubleArrWritable, IntWritable, Do
 	private double dc =0.0;
 	private int iter_i =0;
 	private int start =0;
-	private DoubleArrWritable doubleArr;
+	private DoubleArrStrWritable doubleArr;
 	private IntWritable typeInt = new IntWritable();
 	
-	private MultipleOutputs<DoubleArrWritable,IntWritable> out;  
+	private MultipleOutputs<DoubleArrStrWritable,IntWritable> out;  
 
 	@Override
 	public void setup(Context cxt){
@@ -48,11 +48,11 @@ public class ClusterDataMapper extends Mapper<DoubleArrWritable, IntWritable, Do
 		dc = cxt.getConfiguration().getDouble("DC", Double.MAX_VALUE);
 		iter_i=cxt.getConfiguration().getInt("ITER_I", 0);
 		start=iter_i!=1?1:0;
-		out = new MultipleOutputs<DoubleArrWritable,IntWritable>(cxt);  
+		out = new MultipleOutputs<DoubleArrStrWritable,IntWritable>(cxt);  
 	}
 	
 	@Override
-	public void map(DoubleArrWritable key,IntWritable value,Context cxt){
+	public void map(DoubleArrStrWritable key,IntWritable value,Context cxt){
 		double[] inputI= key.getDoubleArr();
 		
 		
@@ -89,7 +89,7 @@ public class ClusterDataMapper extends Mapper<DoubleArrWritable, IntWritable, Do
 					}
 					reader = new SequenceFile.Reader(conf, Reader.file(path),
 							Reader.bufferSize(4096), Reader.start(0));
-					DoubleArrWritable dkey = (DoubleArrWritable) ReflectionUtils.newInstance(
+					DoubleArrStrWritable dkey = (DoubleArrStrWritable) ReflectionUtils.newInstance(
 							reader.getKeyClass(), conf);
 					IntWritable dvalue = (IntWritable) ReflectionUtils.newInstance(
 							reader.getValueClass(), conf);
@@ -111,7 +111,7 @@ public class ClusterDataMapper extends Mapper<DoubleArrWritable, IntWritable, Do
 			int typeIndex = getTypeIndex(smallDistance,types);
 			log.info("smallDistance:{},types:{}",new Object[]{HUtils.doubleArr2Str(smallDistance),
 					HUtils.intArr2Str(types)});
-			doubleArr = new DoubleArrWritable(inputI);
+			doubleArr = new DoubleArrStrWritable(inputI);
 			typeInt.set(typeIndex);
 			
 			if(typeIndex!=-1){

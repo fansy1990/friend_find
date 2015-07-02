@@ -30,7 +30,7 @@
 				<tr>
 					<td><label for="name">JobName:</label></td>
 					<td><input class="easyui-validatebox" type="text"
-						id="jobname" data-options="required:true" style="width:300px"
+						id="jobname" data-options="required:true" style="width:600px"
 						value="#" />
 					</td>
 					

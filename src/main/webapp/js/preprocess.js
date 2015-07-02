@@ -44,7 +44,43 @@ $(function(){
 		// ajax 异步提交任务
 		callByAJax('cloud/cloud_resolve2db.action',{input:input_});
 	});
-	// ======= 数据下载
+	
+	//findbestdc_submit_id 找到最佳阈值
+	$('#findbestdc_submit_id').bind('click', function(){
+		var input_=$('#findbestdc_input_id').val();
+		var delta_=$('#findbestdc_delta_id').val();
+		// 弹出进度框
+		popupProgressbar('请等待','寻找最佳阈值DC中...',1000);
+		// ajax 异步提交任务
+		callByAJaxLocal_findbestdc('cloud/cloud_findbestdc.action',{input:input_,delta:delta_});
+	});
+	//findbestdc_submit_id
+	
+	//caldistance_submit_id 计算向量之间的距离
+	$('#caldistance_submit_id').bind('click', function(){
+		var input_=$('#caldistance_input_id').val();
+		var output_=$('#caldistance_output_id').val();
+		// 弹出进度框
+		popupProgressbar('请等待','提交计算向量距离任务中...',1000);
+		// ajax 异步提交任务
+		callByAJax('cloud/cloud_caldistance.action',{input:input_,output:output_});
+	});
+	//caldistance_submit_id
+	
+	
+	// ===== 数据预处理 数据库到HDFS
+	$('#preprocess_submit_id').bind('click', function(){
+		var record_=$('#preprocess_record_id').val();
+		var output_=$('#preprocess_output_id').val();
+//		var delta_=$('#preprocess_delta_id').val();
+		
+		// 弹出进度框
+		popupProgressbar('请等待','数据库数据解析并序列化到HFDS中...',1000);
+		// ajax 异步提交任务
+		callByAJax('cloud/cloud_db2hdfs.action',{record:record_,output:output_});
+	});
+	// ======= 数据预处理
+	
 	
 });
 
@@ -58,13 +94,21 @@ function monitor_one_refresh(){
 		success : function(data) {
 			if (data.finished == 'error') {// 获取信息错误 ，返回数据设置为0，否则正常返回
 				clearInterval(monitor_cf_interval);
+				setJobInfoValues(data);
 				console.info("monitor,finished:"+data.finished);
-
+				$.messager.show({
+					title : '提示',
+					msg : '任务运行失败！'
+				});
 			} else if(data.finished == 'true'){
 				// 所有任务运行成功则停止timer
 				console.info('monitor,data.finished='+data.finished);
 				setJobInfoValues(data);
 				clearInterval(monitor_cf_interval);
+				$.messager.show({
+					title : '提示',
+					msg : '所有任务成功运行完成！'
+				});
 				
 			}else{
 				// 设置提示，并更改页面数据,多行显示job任务信息
@@ -84,4 +128,32 @@ function setJobInfoValues(data){
 	$('#mapprogress').val(data.rows.mapProgress);
 	$('#redprogress').val(data.rows.redProgress);
 	$('#state').val(data.rows.runState);
+}
+
+
+function callByAJaxLocal_findbestdc(url,data_){
+	$.ajax({
+		url : url,
+		data: data_,
+		async:true,
+		dataType:"json",
+		context : document.body,
+		success : function(data) {
+//			$.messager.progress('close');
+			closeProgressbar();
+			console.info("data.flag:"+data.flag);
+			var retMsg;
+			if("true"==data.flag){
+				retMsg='操作成功！DC阈值为：'+data.dc;
+				$('#dc_return_id').html("推荐DC阈值为："+data.dc);
+			}else{
+				retMsg='操作失败！失败原因：'+data.msg;
+			}
+			$.messager.show({
+				title : '提示',
+				msg : retMsg
+			});
+			
+		}
+	});
 }

@@ -15,7 +15,7 @@ import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.hadoop.util.Tool;
 
-import com.fz.fast_cluster.keytype.DoubleArrWritable;
+import com.fz.fast_cluster.keytype.DoubleArrStrWritable;
 import com.fz.filter.mr.GetMaxMinMapper;
 import com.fz.filter.mr.GetMaxMinReducer;
 import com.fz.util.HUtils;
@@ -53,12 +53,13 @@ public class GetMaxMinJob extends Configured implements Tool {
 	    job.setNumReduceTasks(1);
 	    
 	    job.setMapOutputKeyClass(IntWritable.class	);
-	    job.setMapOutputValueClass(DoubleArrWritable.class);
+	    job.setMapOutputValueClass(DoubleArrStrWritable.class);
 	    
-	    job.setOutputKeyClass(DoubleArrWritable.class);
+	    job.setOutputKeyClass(DoubleArrStrWritable.class);
 	    job.setOutputValueClass(NullWritable.class);
 	    
 	    job.setOutputFormatClass(SequenceFileOutputFormat.class);
+	    job.setInputFormatClass(SequenceFileInputFormat.class);
 	    SequenceFileInputFormat.addInputPath(job, new Path(otherArgs[0]));
 	    SequenceFileOutputFormat.setOutputPath(job,new Path(otherArgs[1]));
 	    FileSystem.get(conf).delete(new Path(otherArgs[1]), true);

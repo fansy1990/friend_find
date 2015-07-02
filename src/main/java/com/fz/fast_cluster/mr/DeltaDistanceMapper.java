@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fz.fast_cluster.keytype.DDoubleWritable;
-import com.fz.fast_cluster.keytype.DoubleArrWritable;
+import com.fz.fast_cluster.keytype.DoubleArrStrWritable;
 import com.fz.util.HUtils;
 
 /**
@@ -26,7 +26,7 @@ import com.fz.util.HUtils;
  * @date 2015-6-1
  */
 public class DeltaDistanceMapper extends
-		Mapper<DoubleArrWritable, DoubleWritable, DoubleArrWritable, DDoubleWritable> {
+		Mapper<DoubleArrStrWritable, DoubleWritable, DoubleArrStrWritable, DDoubleWritable> {
 	private Logger log = LoggerFactory.getLogger(DeltaDistanceMapper.class);
 	private Path input ;
 	private DDoubleWritable sd= new DDoubleWritable();
@@ -39,7 +39,7 @@ public class DeltaDistanceMapper extends
 	// only read for one file 
 	// maybe add more files support for the another time 
 	@Override
-	public void map(DoubleArrWritable key, DoubleWritable value, Context cxt) throws IOException,InterruptedException{
+	public void map(DoubleArrStrWritable key, DoubleWritable value, Context cxt) throws IOException,InterruptedException{
 		// hdfs
 		Configuration conf = cxt.getConfiguration();
 
@@ -49,7 +49,7 @@ public class DeltaDistanceMapper extends
         try {
             reader = new SequenceFile.Reader(conf,Reader.file(input),
             		Reader.bufferSize(4096),Reader.start(0));
-            DoubleArrWritable dkey = (DoubleArrWritable) ReflectionUtils.newInstance(
+            DoubleArrStrWritable dkey = (DoubleArrStrWritable) ReflectionUtils.newInstance(
                     reader.getKeyClass(), conf);
             DoubleWritable dvalue = (DoubleWritable) ReflectionUtils.newInstance(
                     reader.getValueClass(), conf);

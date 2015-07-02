@@ -15,7 +15,7 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
 import com.fz.fast_cluster.keytype.DDoubleWritable;
-import com.fz.fast_cluster.keytype.DoubleArrWritable;
+import com.fz.fast_cluster.keytype.DoubleArrStrWritable;
 import com.fz.fast_cluster.mr.DeltaDistanceMapper;
 import com.fz.fast_cluster.mr.DeltaDistanceReducer;
 import com.fz.util.HUtils;
@@ -50,7 +50,7 @@ public class DeltaDistanceJob extends Configured implements Tool {
 	    job.setMapperClass(DeltaDistanceMapper.class);
 	    job.setCombinerClass(DeltaDistanceReducer.class);
 	    job.setReducerClass(DeltaDistanceReducer.class);
-	    job.setOutputKeyClass(DoubleArrWritable.class);
+	    job.setOutputKeyClass(DoubleArrStrWritable.class);
 	    job.setOutputValueClass(DDoubleWritable.class);
 	    job.setInputFormatClass(SequenceFileInputFormat.class);
 	    SequenceFileInputFormat.addInputPath(job, new Path(otherArgs[0]));

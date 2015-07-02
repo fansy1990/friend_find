@@ -30,7 +30,7 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 import com.fz.fast_cluster.keytype.DDoubleWritable;
-import com.fz.fast_cluster.keytype.DoubleArrWritable;
+import com.fz.fast_cluster.keytype.DoubleArrStrWritable;
 
 
 /**
@@ -94,7 +94,7 @@ public class DrawPic {
 		try {
 			reader = new SequenceFile.Reader(conf, Reader.file(path),
 					Reader.bufferSize(4096), Reader.start(0));
-			DoubleArrWritable dkey = (DoubleArrWritable) ReflectionUtils.newInstance(
+			DoubleArrStrWritable dkey = (DoubleArrStrWritable) ReflectionUtils.newInstance(
 					reader.getKeyClass(), conf);
 			DDoubleWritable dvalue = (DDoubleWritable) ReflectionUtils.newInstance(
 					reader.getValueClass(), conf);
@@ -123,7 +123,7 @@ public class DrawPic {
 		try {
 			reader = new SequenceFile.Reader(conf, Reader.file(path),
 					Reader.bufferSize(4096), Reader.start(0));
-			DoubleArrWritable dkey = (DoubleArrWritable) ReflectionUtils.newInstance(
+			DoubleArrStrWritable dkey = (DoubleArrStrWritable) ReflectionUtils.newInstance(
 					reader.getKeyClass(), conf);
 			DDoubleWritable dvalue = (DDoubleWritable) ReflectionUtils.newInstance(
 					reader.getValueClass(), conf);

@@ -2,8 +2,21 @@ Friend Find 系统
 
 系统版本
 
-功能1--过滤
+功能1-- 初始化数据库
+	1. 初始化登录表；
+	2. 初始化Hadoop集群配置表；
+	3. 初始化用户数据表；
+
+
+功能2--过滤
    1. 上传users.xml文件到HDFS；
-   2. 运行DeduplicateJob任务，并监控；
-   3. 下载HDFS中去重后的记录到本地文件WEB-INF/classes/deduplicate_users.xml；
-   4. 把WEB-INF/classes/deduplicate_users.xml文件导入到数据库中;
+   2. 运行DeduplicateJob任务，按照EmailHash的值进行去重，并监控；
+   3. 下载HDFS中去重后的记录到本地文件夹WEB-INF/classes/deduplicate_users；
+   4. 把WEB-INF/classes/deduplicate_users/文件导入到数据库中;
+   5. 把数据库中的数据过滤upVotes、downVotes、views同时小于或等于0的记录，其他记录上传到HDFS；
+   6. 计算上传后的数据文件每条记录之间的距离；
+   7. 根据阈值百分比定位最佳推荐DC阈值；
+   
+   
+   
+ -- 测试完成 

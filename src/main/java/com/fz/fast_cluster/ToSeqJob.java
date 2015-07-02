@@ -14,7 +14,7 @@ import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.hadoop.util.Tool;
 
-import com.fz.fast_cluster.keytype.DoubleArrWritable;
+import com.fz.fast_cluster.keytype.DoubleArrStrWritable;
 import com.fz.fast_cluster.mr.ToSeqMapper;
 import com.fz.util.HUtils;
 
@@ -41,7 +41,7 @@ public class ToSeqJob extends Configured implements Tool {
 	    job.setNumReduceTasks(0);
 	    
 	    
-	    job.setOutputKeyClass(DoubleArrWritable.class);
+	    job.setOutputKeyClass(DoubleArrStrWritable.class);
 	    job.setOutputValueClass(IntWritable.class);
 	    
 	    job.setOutputFormatClass(SequenceFileOutputFormat.class);

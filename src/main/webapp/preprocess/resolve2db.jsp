@@ -8,7 +8,8 @@
 				<tr>
 					<td><label for="name">输入路径:</label></td>
 					<td><input class="easyui-validatebox" type="text"
-						id="resolveFileId" data-options="required:true"  />
+						id="resolveFileId" data-options="required:true"  style="width:300px"
+						value="WEB-INF/classes/deduplicate_users"/>
 					</td>
 					
 				</tr>

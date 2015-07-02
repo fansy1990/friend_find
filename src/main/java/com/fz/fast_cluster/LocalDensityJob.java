@@ -15,7 +15,7 @@ import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
-import com.fz.fast_cluster.keytype.DoubleArrWritable;
+import com.fz.fast_cluster.keytype.DoubleArrStrWritable;
 import com.fz.fast_cluster.mr.LocalDensityMapper;
 import com.fz.fast_cluster.mr.LocalDensityReducer;
 import com.fz.util.HUtils;
@@ -58,7 +58,7 @@ public class LocalDensityJob extends Configured implements Tool {
 		job.setMapperClass(LocalDensityMapper.class);
 		job.setCombinerClass(LocalDensityReducer.class);
 		job.setReducerClass(LocalDensityReducer.class);
-		job.setOutputKeyClass(DoubleArrWritable.class);
+		job.setOutputKeyClass(DoubleArrStrWritable.class);
 		job.setOutputValueClass(DoubleWritable.class);
 		job.setOutputFormatClass(SequenceFileOutputFormat.class);
 

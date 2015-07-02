@@ -15,7 +15,7 @@ import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.hadoop.util.Tool;
 
-import com.fz.fast_cluster.keytype.DoubleArrWritable;
+import com.fz.fast_cluster.keytype.DoubleArrStrWritable;
 import com.fz.fast_cluster.mr.ClusterDataMapper;
 import com.fz.util.HUtils;
 
@@ -45,11 +45,11 @@ public class ClusterDataJob extends Configured implements Tool {
 	    job.setNumReduceTasks(0);
 	    
 	    MultipleOutputs.addNamedOutput(job, "clustered", SequenceFileOutputFormat.class,  
-                DoubleArrWritable.class, IntWritable.class);  
+                DoubleArrStrWritable.class, IntWritable.class);  
         MultipleOutputs.addNamedOutput(job, "unclustered", SequenceFileOutputFormat.class,  
-        		DoubleArrWritable.class, IntWritable.class);  
+        		DoubleArrStrWritable.class, IntWritable.class);  
 	    
-	    job.setOutputKeyClass(DoubleArrWritable.class);
+	    job.setOutputKeyClass(DoubleArrStrWritable.class);
 	    job.setOutputValueClass(IntWritable.class);
 	    
 	    job.setInputFormatClass(SequenceFileInputFormat.class);

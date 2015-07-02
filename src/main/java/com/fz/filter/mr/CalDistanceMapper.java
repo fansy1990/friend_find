@@ -10,33 +10,41 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.IOUtils;
-import org.apache.hadoop.io.NullWritable;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.SequenceFile.Reader;
-import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.util.ReflectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.fz.fast_cluster.keytype.DoubleArrStrWritable;
 import com.fz.filter.FilterCounter;
+import com.fz.filter.keytype.DoubleArrWritable;
+import com.fz.filter.keytype.IntPairWritable;
 import com.fz.util.HUtils;
 
 /**
  * @author fansy
- * @date 2015-6-23
+ * @date 2015-6-25
  */
-public class FindInitDCMapper extends Mapper<DoubleArrStrWritable,NullWritable,DoubleWritable, NullWritable> {
-
+public class CalDistanceMapper extends Mapper<DoubleArrWritable, IntWritable, DoubleWritable, IntPairWritable> {
+	private Logger log = LoggerFactory.getLogger(CalDistanceMapper.class);
 	private Path input;
-	private DoubleWritable distance=new DoubleWritable();
+	private DoubleWritable newKey= new DoubleWritable();
+	private IntPairWritable newValue= new IntPairWritable();
+	
 	@Override 
 	public void setup(Context cxt){
 		input=new Path(cxt.getConfiguration().get("INPUT"));// 
 	}
 	
 	@Override
-	public void map(DoubleArrStrWritable key, NullWritable value,Context cxt)throws InterruptedException,IOException{
+	public void map(DoubleArrWritable key, IntWritable value,Context cxt)throws InterruptedException,IOException{
 		cxt.getCounter(FilterCounter.MAP_COUNTER).increment(1L);
+		if(cxt.getCounter(FilterCounter.MAP_COUNTER).getValue()%3000==0){
+			log.info("Map处理了{}条记录...",cxt.getCounter(FilterCounter.MAP_COUNTER).getValue());
+			log.info("Map生成了{}条记录...",cxt.getCounter(FilterCounter.MAP_OUT_COUNTER).getValue());
+		}
 		Configuration conf = cxt.getConfiguration();
 		SequenceFile.Reader reader = null;
 		FileStatus[] fss=input.getFileSystem(conf).listStatus(input);
@@ -47,14 +55,21 @@ public class FindInitDCMapper extends Mapper<DoubleArrStrWritable,NullWritable,D
 			try {
 				reader = new SequenceFile.Reader(conf, Reader.file(f.getPath()),
 						Reader.bufferSize(4096), Reader.start(0));
-				DoubleArrStrWritable dkey = (DoubleArrStrWritable) ReflectionUtils.newInstance(
+				DoubleArrWritable dkey = (DoubleArrWritable) ReflectionUtils.newInstance(
 						reader.getKeyClass(), conf);
-				Writable dvalue = (Writable) ReflectionUtils.newInstance(
+				IntWritable dvalue = (IntWritable) ReflectionUtils.newInstance(
 						reader.getValueClass(), conf);
 	
 				while (reader.next(dkey, dvalue)) {// 循环读取文件
-					distance.set(HUtils.getDistance(key.getDoubleArr(), dkey.getDoubleArr()));
-					cxt.write(distance, NullWritable.get());
+					// 当前IntWritable需要小于给定的dvalue
+					if(value.get()<dvalue.get()){
+						cxt.getCounter(FilterCounter.MAP_OUT_COUNTER).increment(1L);
+						double dis= HUtils.getDistance(key.getDoubleArr(), dkey.getDoubleArr());
+						newKey.set(dis);
+						newValue.setValue(value.get(), dvalue.get());
+						cxt.write(newKey, newValue);
+					}
+
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -64,9 +79,4 @@ public class FindInitDCMapper extends Mapper<DoubleArrStrWritable,NullWritable,D
 		}
 	}
 	
-	@Override
-	public void cleanup(Context cxt){
-		cxt.getConfiguration().setLong(HUtils.MAP_COUNTER, 
-				cxt.getCounter(FilterCounter.MAP_COUNTER).getValue());
-	}
 }

@@ -15,13 +15,13 @@ public class Test {
 	
 	public static void main(String[] args) {
 		Test t = new Test();
-		DoubleArrWritable tt = new DoubleArrWritable(new double[]{1,9,7},"sdf");
+		DoubleArrStrWritable tt = new DoubleArrStrWritable(new double[]{1,9,7},"sdf");
 		System.out.println(tt);
 		t.update(tt);
 		System.out.println(tt);
 	}
 	
-	private void update(DoubleArrWritable tt){
+	private void update(DoubleArrStrWritable tt){
 		tt.getDoubleArr()[0]=9;
 	}
 

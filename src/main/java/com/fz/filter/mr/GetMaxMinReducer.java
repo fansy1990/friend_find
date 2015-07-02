@@ -9,7 +9,7 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.Reducer;
 
-import com.fz.fast_cluster.keytype.DoubleArrWritable;
+import com.fz.fast_cluster.keytype.DoubleArrStrWritable;
 import com.fz.util.HUtils;
 
 /**
@@ -17,10 +17,10 @@ import com.fz.util.HUtils;
  * @author fansy
  * @date 2015-6-23
  */
-public class GetMaxMinReducer extends Reducer<IntWritable, DoubleArrWritable,DoubleArrWritable, NullWritable> {
+public class GetMaxMinReducer extends Reducer<IntWritable, DoubleArrStrWritable,DoubleArrStrWritable, NullWritable> {
 	private int column;
-	private DoubleArrWritable min_=null;
-	private DoubleArrWritable max_ = null;
+	private DoubleArrStrWritable min_=null;
+	private DoubleArrStrWritable max_ = null;
 
 	@Override
 	public void setup(Context cxt){
@@ -30,24 +30,24 @@ public class GetMaxMinReducer extends Reducer<IntWritable, DoubleArrWritable,Dou
 		for(int i=0;i<column;i++){
 			tmp_[i]=Double.MAX_VALUE;
 		}
-		min_=new DoubleArrWritable(tmp_,"min");
+		min_=new DoubleArrStrWritable(tmp_,"min");
 		
 		// 初始化max_,给tmp_赋最小值
 		tmp_= new double[column];
 		for(int i=0;i<column;i++){
 			tmp_[i]=Double.MIN_VALUE;
 		}
-		max_=new DoubleArrWritable(tmp_,"max");
+		max_=new DoubleArrStrWritable(tmp_,"max");
 		
 	} 
 	@Override
-	public void reduce(IntWritable key,Iterable<DoubleArrWritable> values,Context cxt){
+	public void reduce(IntWritable key,Iterable<DoubleArrStrWritable> values,Context cxt){
 		if(key.get()==0){// 最小值，更新最小值即可
-			for(DoubleArrWritable value:values){
+			for(DoubleArrStrWritable value:values){
 				HUtils.updateMin(value, min_, column);
 			}
 		}else{// 最大值，更新最大值
-			for(DoubleArrWritable value:values){
+			for(DoubleArrStrWritable value:values){
 				HUtils.updateMax(value, max_, column);
 			}
 		}

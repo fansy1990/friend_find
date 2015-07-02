@@ -10,7 +10,7 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
-import com.fz.fast_cluster.keytype.DoubleArrWritable;
+import com.fz.fast_cluster.keytype.DoubleArrStrWritable;
 import com.fz.util.HUtils;
 
 
@@ -18,11 +18,11 @@ import com.fz.util.HUtils;
  * @author fansy
  * @date 2015-6-3
  */
-public class ToSeqMapper extends Mapper<LongWritable, Text, DoubleArrWritable, IntWritable> {
+public class ToSeqMapper extends Mapper<LongWritable, Text, DoubleArrStrWritable, IntWritable> {
 
 	private String splitter =null;
 	
-	private DoubleArrWritable doubleArr;
+	private DoubleArrStrWritable doubleArr;
 	private IntWritable typeInt = new IntWritable(-1);
 	@Override
 	public void setup(Context cxt){
@@ -33,7 +33,7 @@ public class ToSeqMapper extends Mapper<LongWritable, Text, DoubleArrWritable, I
 	public void map(LongWritable key,Text value,Context cxt)throws IOException,InterruptedException{
 		double[] inputI= HUtils.getInputI(value,splitter);
 		
-		doubleArr = new DoubleArrWritable(inputI);
+		doubleArr = new DoubleArrStrWritable(inputI);
 		cxt.write(doubleArr, typeInt);
 	}
 }
