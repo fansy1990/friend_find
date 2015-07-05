@@ -1,16 +1,15 @@
 /**
  * 
  */
-package com.fz.fast_cluster.mr;
+package com.fz.fastcluster.mr;
 
 import java.io.IOException;
 
 import org.apache.hadoop.io.DoubleWritable;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.mapreduce.Reducer;
 
-import com.fz.fast_cluster.keytype.DoubleArrStrWritable;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
+import com.fz.util.Utils;
 
 
 /**
@@ -19,19 +18,18 @@ import com.fz.fast_cluster.keytype.DoubleArrStrWritable;
  * @date 2015-6-1
  */
 public class LocalDensityReducer extends
-		Reducer<DoubleArrStrWritable, DoubleWritable, DoubleArrStrWritable, DoubleWritable> {
-//	private Logger log = LoggerFactory.getLogger(LocalDensityReducer.class);
+		Reducer<IntWritable, DoubleWritable, IntWritable, DoubleWritable> {
 	private DoubleWritable sumAll = new DoubleWritable();
+	
 	@Override
-	public void reduce(DoubleArrStrWritable key, Iterable<DoubleWritable> values,Context cxt)
+	public void reduce(IntWritable key, Iterable<DoubleWritable> values,Context cxt)
 	throws IOException,InterruptedException{
 		double sum =0;
-		int i=0;
 		for(DoubleWritable v:values){
 			sum+=v.get();
-			i++;
 		}
-		sumAll.set(sum/i);// 
+		sumAll.set(sum);// 
 		cxt.write(key, sumAll);
+		Utils.simpleLog("vectorI:"+key.get()+",density:"+sumAll);
 	}
 }

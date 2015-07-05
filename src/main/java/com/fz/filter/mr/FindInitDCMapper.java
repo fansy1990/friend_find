@@ -17,7 +17,7 @@ import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.util.ReflectionUtils;
 
-import com.fz.fast_cluster.keytype.DoubleArrStrWritable;
+import com.fz.fastcluster.keytype.DoubleArrStrWritable;
 import com.fz.filter.FilterCounter;
 import com.fz.util.HUtils;
 

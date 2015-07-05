@@ -69,4 +69,20 @@ public class IntPairWritable implements WritableComparable<IntPairWritable>{
 		
 		return this.first+","+this.second;
 	}
+
+	public int getFirst() {
+		return first;
+	}
+
+	public void setFirst(int first) {
+		this.first = first;
+	}
+
+	public int getSecond() {
+		return second;
+	}
+
+	public void setSecond(int second) {
+		this.second = second;
+	}
 }

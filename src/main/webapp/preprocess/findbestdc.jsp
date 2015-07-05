@@ -3,7 +3,10 @@
 
 <body>
 	<div style="padding-left: 30px;font-size: 20px;padding-top:10px;">寻找DC最佳阈值</div>
-	
+	<br>
+	<div style="padding-left: 30px;font-size: 15px;padding-top:10px;"><br>
+		请先运行距离计算MR任务，如果已经运行，请设置记录数<br>
+	</div>
 	<br>
 	<div style="padding-left: 30px;font-size: 20px;padding-top:10px;">
 		<table>
@@ -15,16 +18,17 @@
 					value="/user/root/_filter/caldistance" /></td>
 
 			</tr>
-<!-- 
+ 
 			<tr>
 				<td><label for="name">输入记录数:</label>
 				</td>
 				<td><input class="easyui-validatebox" type="text"
 					id="findbestdc_record_id" data-options="required:true" style="width:300px"
-					value="182414550" /></td>
+					value="0" /></td>
+				<td><label for="name">如果已经运行了距离计算MR，可以不用设置此值</label></td>
 
 			</tr>
-	 -->		
+	 		
 			<tr>
 				<td><label for="name">阈值百分比:</label>
 				</td>

@@ -22,8 +22,9 @@ import com.fz.util.Utils;
 
 /**
  * 计算记录两两之间的距离
- * map输出<doubleWritable,StringPair>
- * reduce 输出<doubleWritable,StringPair>
+ * map输出<DoubleWritable,IntPairWritable>
+ * reduce 输出<doubleWritable,IntPairWritable>
+ *             距离，<样本id，样本id>
  * 
  * @author fansy
  * @date 2015-6-25

@@ -48,6 +48,8 @@ public class Utils {
 	private static ResourceBundle resb = null;
 	private static PrintWriter  writer=null;
 	
+	public static final int GETDRAWPICRECORDS_EVERYFILE=500;// 画决策图时每个文件提取的记录数
+	
 	
 	private static String[] userdata_attributes=new String[]{"Id","Reputation","CreationDate","DisplayName",
 			"EmailHash","LastAccessDate","Location","Age","AboutMe","Views","UpVotes","DownVotes"};

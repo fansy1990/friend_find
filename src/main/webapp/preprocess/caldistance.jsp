@@ -3,7 +3,9 @@
 
 <body>
 	<div style="padding-left: 30px;font-size: 20px;padding-top:10px;">计算向量之间的距离--MR任务</div>
-	
+	<div style="padding-left: 30px;font-size: 15px;padding-top:10px;"><br>
+		如果有MR监控页面，请先关闭，在提交MR任务<br>
+	</div>
 	<br>
 	<div style="padding-left: 30px;font-size: 20px;padding-top:10px;">
 		<table>

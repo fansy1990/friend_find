@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.fz.fast_cluster.mr;
+package com.fz.fastcluster.mr;
 
 import java.io.IOException;
 
@@ -20,15 +20,19 @@ import org.apache.hadoop.util.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fz.fast_cluster.keytype.DoubleArrStrWritable;
+import com.fz.filter.keytype.DoubleArrWritable;
 import com.fz.util.HUtils;
 
 
 /**
+ * 输入：
+ *     vector_i  ,id_i
+ * 输出：
+ *     id_i, type_i
  * @author fansy
  * @date 2015-6-2
  */
-public class ClusterDataMapper extends Mapper<DoubleArrStrWritable, IntWritable, DoubleArrStrWritable, IntWritable> {
+public class ClusterDataMapper extends Mapper<DoubleArrWritable, IntWritable, IntWritable, IntWritable> {
 
 	private Logger log = LoggerFactory.getLogger(ClusterDataMapper.class);
 //	private String center = null;
@@ -36,10 +40,10 @@ public class ClusterDataMapper extends Mapper<DoubleArrStrWritable, IntWritable,
 	private double dc =0.0;
 	private int iter_i =0;
 	private int start =0;
-	private DoubleArrStrWritable doubleArr;
 	private IntWritable typeInt = new IntWritable();
+	private IntWritable vectorI = new IntWritable();
 	
-	private MultipleOutputs<DoubleArrStrWritable,IntWritable> out;  
+	private MultipleOutputs<IntWritable,IntWritable> out;  
 
 	@Override
 	public void setup(Context cxt){
@@ -48,13 +52,13 @@ public class ClusterDataMapper extends Mapper<DoubleArrStrWritable, IntWritable,
 		dc = cxt.getConfiguration().getDouble("DC", Double.MAX_VALUE);
 		iter_i=cxt.getConfiguration().getInt("ITER_I", 0);
 		start=iter_i!=1?1:0;
-		out = new MultipleOutputs<DoubleArrStrWritable,IntWritable>(cxt);  
+		out = new MultipleOutputs<IntWritable,IntWritable>(cxt);  
+		log.info("第{}次循环...",iter_i);
 	}
 	
 	@Override
-	public void map(DoubleArrStrWritable key,IntWritable value,Context cxt){
+	public void map(DoubleArrWritable key,IntWritable value,Context cxt){
 		double[] inputI= key.getDoubleArr();
-		
 		
 		int[] types = new int[k];
 		double[] smallDistance = new double[k];// k clustered points near the given inpuI
@@ -89,7 +93,7 @@ public class ClusterDataMapper extends Mapper<DoubleArrStrWritable, IntWritable,
 					}
 					reader = new SequenceFile.Reader(conf, Reader.file(path),
 							Reader.bufferSize(4096), Reader.start(0));
-					DoubleArrStrWritable dkey = (DoubleArrStrWritable) ReflectionUtils.newInstance(
+					DoubleArrWritable dkey = (DoubleArrWritable) ReflectionUtils.newInstance(
 							reader.getKeyClass(), conf);
 					IntWritable dvalue = (IntWritable) ReflectionUtils.newInstance(
 							reader.getValueClass(), conf);
@@ -106,20 +110,21 @@ public class ClusterDataMapper extends Mapper<DoubleArrStrWritable, IntWritable,
 			}
 			
 			// else 
-			log.info("smallDistance:{},types:{}",new Object[]{HUtils.doubleArr2Str(smallDistance),
-					HUtils.intArr2Str(types)});
+//			log.info("smallDistance:{},types:{}",new Object[]{HUtils.doubleArr2Str(smallDistance),
+//					HUtils.intArr2Str(types)});
 			int typeIndex = getTypeIndex(smallDistance,types);
-			log.info("smallDistance:{},types:{}",new Object[]{HUtils.doubleArr2Str(smallDistance),
-					HUtils.intArr2Str(types)});
-			doubleArr = new DoubleArrStrWritable(inputI);
+//			log.info("smallDistance:{},types:{}",new Object[]{HUtils.doubleArr2Str(smallDistance),
+//					HUtils.intArr2Str(types)});
+			
+			vectorI.set(value.get());// 用户id
 			typeInt.set(typeIndex);
 			
 			if(typeIndex!=-1){
-				log.info("clustered-->doubleArr:{},typeInt:{}",new Object[]{doubleArr,typeInt});
-				out.write("clustered", doubleArr, typeInt,"clustered/part");	
+//				log.info("clustered-->doubleArr:{},typeInt:{}",new Object[]{doubleArr,typeInt});
+				out.write("clustered", vectorI, typeInt,"clustered/part");	
 			}else{
-				log.info("unclustered---->doubleArr:{},typeInt:{}",new Object[]{doubleArr,typeInt});
-				out.write("unclustered", doubleArr, typeInt,"unclustered/part");
+//				log.info("unclustered---->doubleArr:{},typeInt:{}",new Object[]{doubleArr,typeInt});
+				out.write("unclustered", vectorI, typeInt,"unclustered/part");
 			}
 			
 		} catch (Exception e) {

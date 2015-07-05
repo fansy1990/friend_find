@@ -5,6 +5,9 @@
 
 	<div style="padding-left: 30px;font-size: 20px;padding-top:10px;">本地文件上传到HDFS</div>  
 	<br>
+	<div style="padding-left: 30px;font-size: 15px;padding-top:10px;"><br>
+		如果有MR监控页面，请先关闭，在提交MR任务<br>
+	</div>
 	<div style="padding-left: 30px;font-size: 20px;padding-top:10px;">  
 	 
 		<table>

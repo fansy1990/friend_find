@@ -26,7 +26,7 @@ $(function() {
 						{
 							field : 'custKey',
 							title : '配置key',
-							width : '200',
+							width : '300',
 							editor: {//设置其为可编辑
 		                        type: 'validatebox',//设置编辑样式 自带样式有：text，textarea，checkbox，numberbox，validatebox，datebox，combobox，combotree 可自行扩展
 		                        options: {

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.fz.fast_cluster;
+package com.fz.fastcluster;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -15,13 +15,15 @@ import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.hadoop.util.Tool;
 
-import com.fz.fast_cluster.keytype.DoubleArrStrWritable;
-import com.fz.fast_cluster.mr.ClusterDataMapper;
+import com.fz.fastcluster.mr.ClusterDataMapper;
+import com.fz.filter.keytype.DoubleArrIntWritable;
 import com.fz.util.HUtils;
 
 
 /**
  * cluster data 
+ * 
+ * 输入为 db2hdfs的输出
  * @author fansy
  * @date 2015-6-2
  */
@@ -45,11 +47,11 @@ public class ClusterDataJob extends Configured implements Tool {
 	    job.setNumReduceTasks(0);
 	    
 	    MultipleOutputs.addNamedOutput(job, "clustered", SequenceFileOutputFormat.class,  
-                DoubleArrStrWritable.class, IntWritable.class);  
+                DoubleArrIntWritable.class, IntWritable.class);  
         MultipleOutputs.addNamedOutput(job, "unclustered", SequenceFileOutputFormat.class,  
-        		DoubleArrStrWritable.class, IntWritable.class);  
+        		DoubleArrIntWritable.class, IntWritable.class);  
 	    
-	    job.setOutputKeyClass(DoubleArrStrWritable.class);
+	    job.setOutputKeyClass(DoubleArrIntWritable.class);
 	    job.setOutputValueClass(IntWritable.class);
 	    
 	    job.setInputFormatClass(SequenceFileInputFormat.class);
@@ -57,6 +59,7 @@ public class ClusterDataJob extends Configured implements Tool {
 	    
 	    SequenceFileInputFormat.addInputPath(job, new Path(otherArgs[0]));
 	    SequenceFileOutputFormat.setOutputPath(job,new Path(otherArgs[1]));
+	    
 	    FileSystem.get(conf).delete(new Path(otherArgs[1]), true);
 	    return job.waitForCompletion(true) ? 0 : 1;
 	}

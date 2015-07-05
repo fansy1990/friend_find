@@ -33,8 +33,8 @@ import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobStatus;
 import org.apache.hadoop.util.ReflectionUtils;
 
-import com.fz.fast_cluster.keytype.DDoubleWritable;
-import com.fz.fast_cluster.keytype.DoubleArrStrWritable;
+import com.fz.fastcluster.keytype.DoublePairWritable;
+import com.fz.fastcluster.keytype.DoubleArrStrWritable;
 import com.fz.filter.keytype.DoubleArrWritable;
 import com.fz.model.CurrentJobInfo;
 import com.fz.model.UserData;
@@ -83,8 +83,10 @@ public class HUtils {
 	public static long INPUT_RECORDS = 0L;// 文件全部记录数，任务FindInitDCJob任务后对此值进行赋值
 
 	// fast cluster
-	public static final String LOCALDENSITYOUTPUT = "/user/root/_localdensity";
-	public static final String DELTADISTANCEOUTPUT = "/user/root/_deltadistance";
+	public static final String LOCALDENSITYOUTPUT = "/user/root/localdensity";
+	public static final String DELTADISTANCEOUTPUT = "/user/root/deltadistance";
+	public static final String DELTADISTANCEBIN = "/user/root/deltadistance.bin";// 局部密度最大向量id存储路径
+	public static final String SORTOUTPUT = "/user/root/sort";
 	public static final String FIRSTCENTERPATH = "/user/root/_center/iter_0/clustered/part-m-00000";
 	public static final String FIRSTUNCLUSTEREDPATH = "/user/root/_center/iter_0/unclustered";
 	public static final String CENTERPATH = "/user/root/_center";
@@ -247,7 +249,12 @@ public class HUtils {
 
 		return Utils.getKey("fs.defaultFS", flag) + url;
 	}
-
+	public static Path getHDFSPath(String url,String flag) {
+		if("true".equals(flag)){
+			return new Path(url);
+		}
+		return new Path(getHDFSPath(url));
+	}
 	/**
 	 * use the oath distance
 	 * 
@@ -277,6 +284,7 @@ public class HUtils {
 		Path dst = new Path(hdfsPath);
 		try {
 			fs.copyFromLocalFile(src, dst);
+			Utils.simpleLog(localPath+"上传至"+hdfsPath+"成功");
 		} catch (Exception e) {
 			ret.put("flag", "false");
 			ret.put("msg", e.getMessage());
@@ -593,11 +601,11 @@ public class HUtils {
 					Reader.bufferSize(4096), Reader.start(0));
 			DoubleArrStrWritable dkey = (DoubleArrStrWritable) ReflectionUtils
 					.newInstance(reader.getKeyClass(), conf);
-			DDoubleWritable dvalue = (DDoubleWritable) ReflectionUtils
+			DoublePairWritable dvalue = (DoublePairWritable) ReflectionUtils
 					.newInstance(reader.getValueClass(), conf);
 
 			while (reader.next(dkey, dvalue)) {// 循环读取文件
-				bw.write(dvalue.getDistance() + "," + dvalue.getSum());
+				bw.write(dvalue.getFirst() + "," + dvalue.getSecond());
 				bw.newLine();
 			}
 			System.out.println(new java.util.Date() + "ds file:" + localPath);
@@ -817,7 +825,7 @@ public class HUtils {
 				}
 				dKey.setDoubleArr(getDoubleArr(user));
 				dVal.set(getIntVal(user));
-				writer.append(dKey, dVal);
+				writer.append(dKey, dVal);// 用户的有效向量，用户id
 				recordNum++;
 			}
 		} catch (IOException e) {

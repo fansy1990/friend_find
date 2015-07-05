@@ -21,7 +21,7 @@ $(function(){
 						title : 'RunCluster1 MR算法监控',
 						closable : true,
 						// iconCls : node.iconCls,
-						href : 'cluster/monitor.jsp'
+						href : 'cluster/monitor_one.jsp' //使用新版监控 
 					});
 				}
 			}

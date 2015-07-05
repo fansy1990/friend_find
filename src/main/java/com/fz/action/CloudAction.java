@@ -17,7 +17,6 @@ import com.fz.model.CurrentJobInfo;
 import com.fz.service.DBService;
 import com.fz.thread.CalDistance;
 import com.fz.thread.Deduplicate;
-import com.fz.thread.PreProcess;
 import com.fz.thread.RunCluster1;
 import com.fz.util.DrawPic;
 import com.fz.util.HUtils;
@@ -38,7 +37,9 @@ public class CloudAction extends ActionSupport {
 	private static final long serialVersionUID = 1L;
 	
 	private String input;
-	private String splitter;
+	private String numReducerDensity;
+	private String numReducerDistance;
+	private String numReducerSort;
 	private String delta;
 	private String method;
 	
@@ -60,15 +61,18 @@ public class CloudAction extends ActionSupport {
 			// 1. 设置提交时间阈值,并设置这组job的个数
 			//使用当前时间即可,当前时间往前10s，以防服务器和云平台时间相差
 			HUtils.setJobStartTime(System.currentTimeMillis()-10000);// 
-			HUtils.JOBNUM=2;
+			HUtils.JOBNUM=3;
 			// 2. 使用Thread的方式启动一组MR任务
-			new Thread(new RunCluster1(input, splitter, delta, method)).start();
+			new Thread(new RunCluster1(input, delta, method,numReducerDensity,
+					numReducerDistance,numReducerSort)).start();
 			// 3. 启动成功后，直接返回到监控，同时监控定时向后台获取数据，并在前台展示；
 			
 			map.put("flag", "true");
+			map.put("monitor", "true");
 		} catch (Exception e) {
 			e.printStackTrace();
 			map.put("flag", "false");
+			map.put("monitor", "false");
 			map.put("msg", e.getMessage());
 		}
 		Utils.write2PrintWriter(JSON.toJSONString(map));
@@ -98,7 +102,7 @@ public class CloudAction extends ActionSupport {
 	 * 画决策图
 	 */
 	public void drawDecisionChart(){
-		String url =HUtils.getHDFSPath("/user/root/iris_deltadistance/part-r-00000");
+		String url =HUtils.getHDFSPath(HUtils.SORTOUTPUT);
 		String file =Utils.getRootPathBasedPath("pictures\\decision_chart.png");
 		Map<String,Object> map = new HashMap<String,Object>();
 		map.put("path", file);
@@ -115,7 +119,8 @@ public class CloudAction extends ActionSupport {
 		return ;
 	}
 	/**
-	 * 数据库数据解析到云平台
+	 * 数据库数据解析到云平台,为序列文件，是聚类运行的输入文件
+	 * 
 	 * [DoubleArrWritable,IntWritable]
 	 */
 	public void db2hdfs(){
@@ -144,7 +149,17 @@ public class CloudAction extends ActionSupport {
 	public void findbestdc(){
 		double dc=0.0;
 		Map<String,Object> map = new HashMap<String,Object>();
+		int recordInt = Integer.parseInt(record);
+		if(HUtils.INPUT_RECORDS==0&&recordInt!=0){
+			HUtils.INPUT_RECORDS=recordInt;
+		}
 		try{
+			if(HUtils.INPUT_RECORDS==0){
+				map.put("flag", "false");
+				map.put("msg", "请先运行计算距离MR任务，或者设置任务运行后的记录数!");
+				Utils.write2PrintWriter(JSON.toJSONString(map));
+				return ;
+			}
 			dc=HUtils.findInitDC(Double.parseDouble(delta.substring(0, delta.length()-1))/100, input, 
 					HUtils.INPUT_RECORDS);
 		}catch(Exception e){
@@ -327,25 +342,7 @@ public class CloudAction extends ActionSupport {
 		Utils.write2PrintWriter(JSON.toJSONString(map));
 		return ;
 	}
-	/**
-	 * 预处理MR任务提交
-	 */
-	public void preprocess(){
-		Map<String ,Object> map = new HashMap<String,Object>();
-		try{
-			HUtils.setJobStartTime(System.currentTimeMillis()-10000);
-			HUtils.JOBNUM=4;// 预处理任务有4个MR任务
-			new Thread(new PreProcess(input,output,delta)).start();
-			map.put("flag", "true");
-			map.put("monitor", "true");
-		} catch (Exception e) {
-			e.printStackTrace();
-			map.put("flag", "false");
-			map.put("monitor", "false");
-			map.put("msg", e.getMessage());
-		}
-		Utils.write2PrintWriter(JSON.toJSONString(map));
-	}
+	
 
 	public String getInput() {
 		return input;
@@ -354,16 +351,6 @@ public class CloudAction extends ActionSupport {
 
 	public void setInput(String input) {
 		this.input = input;
-	}
-
-
-	public String getSplitter() {
-		return splitter;
-	}
-
-
-	public void setSplitter(String splitter) {
-		this.splitter = splitter;
 	}
 
 
@@ -427,6 +414,36 @@ public class CloudAction extends ActionSupport {
 	 */
 	public void setRecord(String record) {
 		this.record = record;
+	}
+
+	public String getNumReducerDensity() {
+		return numReducerDensity;
+	}
+
+	public void setNumReducerDensity(String numReducerDensity) {
+		this.numReducerDensity = numReducerDensity;
+	}
+
+	public String getNumReducerDistance() {
+		return numReducerDistance;
+	}
+
+	public void setNumReducerDistance(String numReducerDistance) {
+		this.numReducerDistance = numReducerDistance;
+	}
+
+	/**
+	 * @return the numReducerSort
+	 */
+	public String getNumReducerSort() {
+		return numReducerSort;
+	}
+
+	/**
+	 * @param numReducerSort the numReducerSort to set
+	 */
+	public void setNumReducerSort(String numReducerSort) {
+		this.numReducerSort = numReducerSort;
 	}
 
 

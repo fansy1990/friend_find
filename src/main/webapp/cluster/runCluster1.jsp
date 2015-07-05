@@ -6,32 +6,23 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
 
 <body>
-	<div  style="padding-left: 30px;font-size: 20px;padding-top:10px;">Fast Cluster 算法调用</div><br>
+	<div  style="padding-left: 30px;font-size: 20px;padding-top:10px;">Fast Cluster 算法调用</div>
+	<br>
+	<div style="padding-left: 30px;font-size: 15px;padding-top:10px;"><br>
+		文件去重操作在HDFS上面进行,如果有MR监控页面，请先关闭，在提交MR任务<br>
+	</div>
     <div style="padding-left: 30px;font-size: 20px;padding-top:10px;">
 		<form id="formid" method="post">
 			<table>
 				<tr>
 					<td><label for="name">输入路径:</label></td>
 					<td><input class="easyui-validatebox" type="text"
-						name="input" data-options="required:true"  />
+						name="input" data-options="required:true" 
+						style="width:200px" value="/user/root/_filter/caldistance" />
 					</td>
 					
 				</tr>
-				<tr>
-					<td><label for="name">输入分隔符:</label></td>
-					<td>
-					<select id="splitter" class="easyui-combobox" name="splitter"
-						style="width:200px;">
-							<option value=",">逗号,</option>
-							<option value=";">分号;</option>
-							<option value=":">冒号:</option>
-							<option value="|">|号</option>
-							<option value =".">句号.</option>
-							<option value="-">破折号-</option>
-							<option value=" ">空格' '</option>
-						</select>
-					</td>
-				</tr>
+				
 				<tr>
 					<td><label for="name">距离阈值:</label></td>
 					<td><input class="easyui-validatebox" type="text"
@@ -48,8 +39,26 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 							<option value="cutoff">Cut-off算法</option>
 						</select>
 					</td>
-					
-			
+				</tr>
+				
+				<tr>
+					<td><label for="name">局部密度MR Reducer个数:</label></td>
+					<td><input class="easyui-validatebox" type="text"
+						 name="numReducerDensity" data-options="required:true" value="1" />
+					</td>
+				</tr>
+				<tr>
+					<td><label for="name">最小距离MR Reducer个数:</label></td>
+					<td><input class="easyui-validatebox" type="text"
+						 name="numReducerDistance" data-options="required:true" value="1" />
+					</td>
+				</tr>
+				<tr>
+					<td><label for="name">排序MR Reducer个数:</label></td>
+					<td><input class="easyui-validatebox" type="text"
+						 name="numReducerSort" data-options="required:true" value="1" />
+					</td>
+				</tr>
 				<tr>
 					<td><a id="submitid" href="#"
 						class="easyui-linkbutton">提交</a></td>

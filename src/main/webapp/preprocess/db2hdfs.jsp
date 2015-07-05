@@ -10,10 +10,6 @@
 			<li>提取Mysql数据库UserData数据</li>
 			<li>过滤UserData中符合规则的数据</li>
 			<li>把符合规则的UserData数据序列化写入HDFS</li>
-			<!-- 
-			<li>归一化</li>
-			<li>寻找dc阈值</li>
-			 -->
 		</ol>
 	</div>
 	<br>

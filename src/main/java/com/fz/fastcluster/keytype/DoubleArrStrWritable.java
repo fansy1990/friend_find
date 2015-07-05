@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.fz.fast_cluster.keytype;
+package com.fz.fastcluster.keytype;
 
 import java.io.DataInput;
 import java.io.DataOutput;

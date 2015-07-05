@@ -49,10 +49,11 @@ $(function(){
 	$('#findbestdc_submit_id').bind('click', function(){
 		var input_=$('#findbestdc_input_id').val();
 		var delta_=$('#findbestdc_delta_id').val();
+		var record_=$('#findbestdc_record_id').val();
 		// 弹出进度框
 		popupProgressbar('请等待','寻找最佳阈值DC中...',1000);
 		// ajax 异步提交任务
-		callByAJaxLocal_findbestdc('cloud/cloud_findbestdc.action',{input:input_,delta:delta_});
+		callByAJaxLocal_findbestdc('cloud/cloud_findbestdc.action',{input:input_,delta:delta_,record:record_});
 	});
 	//findbestdc_submit_id
 	
@@ -125,8 +126,10 @@ function setJobInfoValues(data){
 	$('#currjob').val(data.currjob);
 	$('#jobid').val(data.rows.jobId);
 	$('#jobname').val(data.rows.jobName);
-	$('#mapprogress').val(data.rows.mapProgress);
-	$('#redprogress').val(data.rows.redProgress);
+
+//	(n*100).toFixed(2)+"%" // 保留两位小数，同时转为百分数
+	$('#mapprogress').val((data.rows.mapProgress*100).toFixed(2)+'%');
+	$('#redprogress').val((data.rows.redProgress*100).toFixed(2)+'%');
 	$('#state').val(data.rows.runState);
 }
 
