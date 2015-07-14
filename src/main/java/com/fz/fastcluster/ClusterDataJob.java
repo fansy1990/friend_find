@@ -24,6 +24,7 @@ import com.fz.util.HUtils;
  * cluster data 
  * 
  * 输入为 db2hdfs的输出
+ * 
  * @author fansy
  * @date 2015-6-2
  */
@@ -35,24 +36,23 @@ public class ClusterDataJob extends Configured implements Tool {
 	    String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
 	    if (otherArgs.length !=5) {
 	      System.err.println("Usage: fz.fast_cluster.ClusterData <in> <out>" +
-	      		" <centerK> <dc> <iter_i>");
+	      		" <K> <dc> <iter_i>");
 	      System.exit(5);
 	    }
 	    conf.setInt("K", Integer.parseInt(otherArgs[2]));
 	    conf.setDouble("DC", Double.parseDouble(otherArgs[3]));
 	    conf.setInt("ITER_I", Integer.parseInt(otherArgs[4]));
-	    Job job =  Job.getInstance(conf,"cluster data with iteration: "+otherArgs[4]);
+	    Job job =  Job.getInstance(conf,"cluster data with iteration: "+otherArgs[4]+",dc阈值："+otherArgs[3]);
 	    job.setJarByClass(ClusterDataJob.class);
 	    job.setMapperClass(ClusterDataMapper.class);
 	    job.setNumReduceTasks(0);
 	    
+	    // <id,<type,用户有效向量>>
 	    MultipleOutputs.addNamedOutput(job, "clustered", SequenceFileOutputFormat.class,  
-                DoubleArrIntWritable.class, IntWritable.class);  
+                IntWritable.class, DoubleArrIntWritable.class);
+	    // <id,<type,用户有效向量>>
         MultipleOutputs.addNamedOutput(job, "unclustered", SequenceFileOutputFormat.class,  
-        		DoubleArrIntWritable.class, IntWritable.class);  
-	    
-	    job.setOutputKeyClass(DoubleArrIntWritable.class);
-	    job.setOutputValueClass(IntWritable.class);
+        		IntWritable.class, DoubleArrIntWritable.class);  
 	    
 	    job.setInputFormatClass(SequenceFileInputFormat.class);
 	    job.setOutputFormatClass(SequenceFileOutputFormat.class);

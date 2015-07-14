@@ -6,10 +6,10 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
 
 <body>
-	<div  style="padding-left: 30px;font-size: 20px;padding-top:10px;">Fast Cluster 算法调用</div>
+	<div  style="padding-left: 30px;font-size: 20px;padding-top:10px;">Fast Cluster 算法调用--寻找中心向量</div>
 	<br>
 	<div style="padding-left: 30px;font-size: 15px;padding-top:10px;"><br>
-		文件去重操作在HDFS上面进行,如果有MR监控页面，请先关闭，在提交MR任务<br>
+		如果有MR监控页面，请先关闭，在提交MR任务<br>
 	</div>
     <div style="padding-left: 30px;font-size: 20px;padding-top:10px;">
 		<form id="formid" method="post">
@@ -31,7 +31,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 					
 				</tr>
 				<tr>
-					<td><label for="name">距离算法:</label></td>
+					<td><label for="name">密度计算方法:</label></td>
 					<td>
 					<select id="method" class="easyui-combobox" name="method"
 						style="width:200px;">

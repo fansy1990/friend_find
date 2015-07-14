@@ -10,6 +10,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -342,6 +343,25 @@ public class Utils {
 	 */
 	public static void simpleLog(String msg){
 		System.out.println(new java.util.Date()+":"+msg);
+	}
+
+	/**
+	 * 获取给定数组两两之间的距离(欧式距离:HUtils.getDistance() )，每个行为一个向量
+	 * 并把这些距离按照大小从小到大排序
+	 * @param vectors
+	 * @return
+	 */
+	public static double[] getDistances(double[][] vectors) {
+		double[] distances= new double[vectors.length*(vectors.length-1)/2];
+		int k=0;
+		for(int i=0;i<vectors.length;i++){
+			for(int j=i+1;j<vectors.length;j++){
+				distances[k++]=HUtils.getDistance(vectors[i], vectors[j]);
+			}
+		}
+		// sort 
+		Arrays.sort(distances);
+		return distances;
 	}
 	
 }

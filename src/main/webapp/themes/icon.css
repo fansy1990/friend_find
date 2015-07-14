@@ -3000,3 +3000,10 @@
 .icon-zoom_out
   {    background: url('icons/zoom_out.png') no-repeat scroll center center transparent;
 }
+
+.icon-large_chart
+  {    background: url('icons/large_chart.png') no-repeat scroll center center transparent;
+}
+.icon-large_picture
+  {    background: url('icons/large_picture.png') no-repeat scroll center center transparent;
+}

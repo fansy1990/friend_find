@@ -123,18 +123,17 @@
 			
 		},{
 			"id":133,
-			"text":"执行分类",
+			"text":"寻找聚类中心",
 			"attributes":{
 				"folder":"0",
-				"url":""
+				"url":"cluster/center2hdfs.jsp"	
 			}
 		},{
 			"id":134,
-			"text":"Games",
-			"checked":true,
+			"text":"执行分类",
 			"attributes":{
 				"folder":"0",
-				"url":""
+				"url":"cluster/runCluster2.jsp"
 			}
 		}]
 	},{

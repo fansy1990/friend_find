@@ -14,10 +14,12 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
 import com.fz.model.CurrentJobInfo;
+import com.fz.model.UserData;
 import com.fz.service.DBService;
 import com.fz.thread.CalDistance;
 import com.fz.thread.Deduplicate;
 import com.fz.thread.RunCluster1;
+import com.fz.thread.RunCluster2;
 import com.fz.util.DrawPic;
 import com.fz.util.HUtils;
 import com.fz.util.Utils;
@@ -119,9 +121,79 @@ public class CloudAction extends ActionSupport {
 		return ;
 	}
 	/**
+	 * 根据给定的k值寻找聚类中心向量，并写入hdfs
+	 * 非MR任务，不需要监控，注意返回值
+	 */
+	public void center2hdfs(){
+		//k: record
+		// localfile:method
+		// 1. 读取SortJob的输出，获取前面k条记录的id；
+		// 2. 根据id，找到每个id对应的记录；
+		// 3. 把记录转为double[] ；
+		// 4. 把向量写入hdfs
+		// 5. 把向量写入本地文件中，方便后面的查看
+		Map<String,Object> retMap=new HashMap<String,Object>();
+		
+		Map<Object,Object> firstK =null;
+		List<Integer> ids= null;
+		List<UserData> users=null;
+		try{
+		firstK=HUtils.readSeq(input==null?HUtils.SORTOUTPUT+"/part-r-00000":input,
+				Integer.parseInt(record));
+		ids=HUtils.getCentIds(firstK);
+		// 2
+		users = dBService.getTableData("UserData",ids);
+		
+		// 3,4,5
+		HUtils.writecenter2hdfs(users,method,output);
+		
+		
+		}catch(Exception e){
+			e.printStackTrace();
+			retMap.put("flag", "false");
+			retMap.put("msg", e.getMessage());
+			Utils.write2PrintWriter(JSON.toJSONString(retMap));
+			return ;
+		}
+		retMap.put("flag", "true");
+		Utils.write2PrintWriter(JSON.toJSONString(retMap));
+		return ;
+	}
+	
+	/**
+	 * 快速聚类--执行聚类
+	 * 
+	 */
+	public void runCluster2(){
+		Map<String ,Object> map = new HashMap<String,Object>();
+		try {
+			//提交一个Hadoop MR任务的基本流程
+			// 1. 设置提交时间阈值,并设置这组job的个数
+			//使用当前时间即可,当前时间往前10s，以防服务器和云平台时间相差
+			HUtils.setJobStartTime(System.currentTimeMillis()-10000);// 
+			// 由于不知道循环多少次完成，所以这里设置为2，每次循环都递增1
+			// 当所有循环完成的时候，就该值减去2即可停止监控部分的循环
+			HUtils.JOBNUM=2;
+			
+			// 2. 使用Thread的方式启动一组MR任务
+			new Thread(new RunCluster2(input, output,delta, record)).start();
+			// 3. 启动成功后，直接返回到监控，同时监控定时向后台获取数据，并在前台展示；
+			
+			map.put("flag", "true");
+			map.put("monitor", "true");
+		} catch (Exception e) {
+			e.printStackTrace();
+			map.put("flag", "false");
+			map.put("monitor", "false");
+			map.put("msg", e.getMessage());
+		}
+		Utils.write2PrintWriter(JSON.toJSONString(map));
+	}
+	
+	/**
 	 * 数据库数据解析到云平台,为序列文件，是聚类运行的输入文件
 	 * 
-	 * [DoubleArrWritable,IntWritable]
+	 * [IntWritable,DoubleArrIntWritable]
 	 */
 	public void db2hdfs(){
 		List<Object> list = dBService.getTableAllData("UserData");

@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fz.filter.FilterCounter;
-import com.fz.filter.keytype.DoubleArrWritable;
+import com.fz.filter.keytype.DoubleArrIntWritable;
 import com.fz.filter.keytype.IntPairWritable;
 import com.fz.util.HUtils;
 
@@ -27,7 +27,7 @@ import com.fz.util.HUtils;
  * @author fansy
  * @date 2015-6-25
  */
-public class CalDistanceMapper extends Mapper<DoubleArrWritable, IntWritable, DoubleWritable, IntPairWritable> {
+public class CalDistanceMapper extends Mapper<IntWritable,DoubleArrIntWritable, DoubleWritable, IntPairWritable> {
 	private Logger log = LoggerFactory.getLogger(CalDistanceMapper.class);
 	private Path input;
 	private DoubleWritable newKey= new DoubleWritable();
@@ -39,7 +39,7 @@ public class CalDistanceMapper extends Mapper<DoubleArrWritable, IntWritable, Do
 	}
 	
 	@Override
-	public void map(DoubleArrWritable key, IntWritable value,Context cxt)throws InterruptedException,IOException{
+	public void map(IntWritable key,DoubleArrIntWritable  value,Context cxt)throws InterruptedException,IOException{
 		cxt.getCounter(FilterCounter.MAP_COUNTER).increment(1L);
 		if(cxt.getCounter(FilterCounter.MAP_COUNTER).getValue()%3000==0){
 			log.info("Map处理了{}条记录...",cxt.getCounter(FilterCounter.MAP_COUNTER).getValue());
@@ -55,18 +55,18 @@ public class CalDistanceMapper extends Mapper<DoubleArrWritable, IntWritable, Do
 			try {
 				reader = new SequenceFile.Reader(conf, Reader.file(f.getPath()),
 						Reader.bufferSize(4096), Reader.start(0));
-				DoubleArrWritable dkey = (DoubleArrWritable) ReflectionUtils.newInstance(
+				IntWritable dKey = (IntWritable) ReflectionUtils.newInstance(
 						reader.getKeyClass(), conf);
-				IntWritable dvalue = (IntWritable) ReflectionUtils.newInstance(
+				DoubleArrIntWritable dVal = (DoubleArrIntWritable) ReflectionUtils.newInstance(
 						reader.getValueClass(), conf);
 	
-				while (reader.next(dkey, dvalue)) {// 循环读取文件
-					// 当前IntWritable需要小于给定的dvalue
-					if(value.get()<dvalue.get()){
+				while (reader.next(dKey, dVal)) {// 循环读取文件
+					// 当前IntWritable需要小于给定的dKey
+					if(key.get()<dKey.get()){
 						cxt.getCounter(FilterCounter.MAP_OUT_COUNTER).increment(1L);
-						double dis= HUtils.getDistance(key.getDoubleArr(), dkey.getDoubleArr());
+						double dis= HUtils.getDistance(value.getDoubleArr(), dVal.getDoubleArr());
 						newKey.set(dis);
-						newValue.setValue(value.get(), dvalue.get());
+						newValue.setValue(key.get(), dKey.get());
 						cxt.write(newKey, newValue);
 					}
 

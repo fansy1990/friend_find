@@ -34,6 +34,16 @@ public class DoubleArrIntWritable implements WritableComparable<DoubleArrIntWrit
 		this.identifier=identifier;
 	}
 	
+	public void setValue(double[] doubleArr){
+		setValue(doubleArr,0);
+	}
+	
+	public void setValue(double[] doubleArr,int identifier){
+		this.len=doubleArr.length;
+		this.doubleArr=doubleArr;
+		this.identifier=identifier;
+	}
+	
 	public void write(DataOutput out) throws IOException {
 		out.writeInt(identifier);
 		out.writeInt(len);  

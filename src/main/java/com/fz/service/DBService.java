@@ -275,6 +275,20 @@ public class DBService {
 		}
 		return true;
 	}
+	/**
+	 * @param tableName
+	 * @param ids
+	 * @return
+	 */
+	public List<UserData> getTableData(String tableName,
+			List<Integer> ids) {
+		List<UserData> uds = new ArrayList<UserData>();
+		String hql = "from "+tableName+" ud where ud.id=?";
+		for(Integer id:ids){
+			uds.add((UserData)baseDao.find(hql, new Object[]{id}).get(0));
+		}
+		return uds;
+	}
 	
 	
 	

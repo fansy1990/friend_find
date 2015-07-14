@@ -5,6 +5,7 @@ package com.fz.util;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,7 +17,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
@@ -29,13 +32,15 @@ import org.apache.hadoop.io.SequenceFile.Writer;
 import org.apache.hadoop.io.SequenceFile.Writer.Option;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
+import org.apache.hadoop.io.WritableUtils;
 import org.apache.hadoop.mapred.JobClient;
 import org.apache.hadoop.mapred.JobStatus;
 import org.apache.hadoop.util.ReflectionUtils;
 
-import com.fz.fastcluster.keytype.DoublePairWritable;
 import com.fz.fastcluster.keytype.DoubleArrStrWritable;
-import com.fz.filter.keytype.DoubleArrWritable;
+import com.fz.fastcluster.keytype.DoublePairWritable;
+import com.fz.fastcluster.keytype.IntDoublePairWritable;
+import com.fz.filter.keytype.DoubleArrIntWritable;
 import com.fz.model.CurrentJobInfo;
 import com.fz.model.UserData;
 
@@ -48,8 +53,6 @@ import com.fz.model.UserData;
 public class HUtils {
 
 	public static final double VERYSMALL = 0.00000000000000000000000000001;
-
-	// private static final String DEFAULTFS="hdfs://node101:8020";
 
 	// pre filter
 	// 最原始user.xml文件
@@ -72,6 +75,7 @@ public class HUtils {
 			+ "caldistance";// 计算向量之间的距离
 
 	public static final String DEDUPLICATE_LOCAL = "WEB-INF/classes/deduplicate_users.xml";
+	public static final String LOCALCENTERFILE="WEB-INF/classes/centervector.dat";// 本地中心点文件 
 
 	public static final String MAP_COUNTER = "MAP_COUNTER";
 	public static final String REDUCE_COUNTER = "REDUCE_COUNTER";
@@ -243,12 +247,19 @@ public class HUtils {
 	 * 返回HDFS路径
 	 * 
 	 * @param url
-	 * @return
+	 * @return fs.defaultFs+url
 	 */
 	public static String getHDFSPath(String url) {
 
 		return Utils.getKey("fs.defaultFS", flag) + url;
 	}
+	/**
+	 * 获得Path路径
+	 * 如果url包含hdfs:// ，那么flag使用true，否则flag使用false
+	 * @param url
+	 * @param flag
+	 * @return
+	 */
 	public static Path getHDFSPath(String url,String flag) {
 		if("true".equals(flag)){
 			return new Path(url);
@@ -814,18 +825,18 @@ public class HUtils {
 		try {
 			Option optPath = SequenceFile.Writer.file(path);
 			Option optKey = SequenceFile.Writer
-					.keyClass(DoubleArrWritable.class);
-			Option optVal = SequenceFile.Writer.valueClass(IntWritable.class);
+					.keyClass(IntWritable.class);
+			Option optVal = SequenceFile.Writer.valueClass(DoubleArrIntWritable.class);
 			writer = SequenceFile.createWriter(conf, optPath, optKey, optVal);
-			DoubleArrWritable dKey = new DoubleArrWritable();
-			IntWritable dVal = new IntWritable();
+			DoubleArrIntWritable dVal = new DoubleArrIntWritable();
+			IntWritable dKey = new IntWritable();
 			for (Object user : list) {
 				if(!checkUser(user)){
 					continue; // 不符合规则 
 				}
-				dKey.setDoubleArr(getDoubleArr(user));
-				dVal.set(getIntVal(user));
-				writer.append(dKey, dVal);// 用户的有效向量，用户id
+				dVal.setValue(getDoubleArr(user),-1);
+				dKey.set(getIntVal(user));
+				writer.append(dKey, dVal);// 用户id,<type,用户的有效向量 >// 后面执行分类的时候需要统一格式，所以这里需要反过来
 				recordNum++;
 			}
 		} catch (IOException e) {
@@ -870,7 +881,7 @@ public class HUtils {
 	 *            reputations,upVotes,downVotes,views
 	 * @return
 	 */
-	private static double[] getDoubleArr(Object user) {
+	public static double[] getDoubleArr(Object user) {
 		double[] arr = new double[4];
 		UserData tUser = (UserData) user;
 		arr[0] = tUser.getReputation();
@@ -878,6 +889,214 @@ public class HUtils {
 		arr[2] = tUser.getDownVotes();
 		arr[3] = tUser.getViews();
 		return arr;
+	}
+
+	/**
+	 * 读取给定序列文件的前面k条记录
+	 * @param input
+	 * @param k
+	 * @return
+	 */
+	public static Map<Object, Object> readSeq(String input, int k) {
+		Map<Object,Object> map= new HashMap<Object,Object>();
+		Path path = HUtils.getHDFSPath(input,"false");
+		Configuration conf = HUtils.getConf();
+		SequenceFile.Reader reader = null;
+		try {
+			reader = new SequenceFile.Reader(conf, Reader.file(path),
+					Reader.bufferSize(4096), Reader.start(0));
+			Writable dkey =  (Writable) ReflectionUtils
+					.newInstance(reader.getKeyClass(), conf);
+			Writable dvalue =  (Writable) ReflectionUtils
+					.newInstance(reader.getValueClass(), conf);
+
+			while (reader.next(dkey, dvalue)&&k>0) {// 循环读取文件
+				// 使用这个进行克隆
+				map.put(WritableUtils.clone(dkey, conf),WritableUtils.clone( dvalue,conf));
+				k--;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			IOUtils.closeStream(reader);
+		}
+		return map;
+	}
+
+	/**
+	 * 获取firstK中的id
+	 * {key:mul,value:third:id}
+	 * @param firstK
+	 * @return
+	 */
+	public static List<Integer> getCentIds(Map<Object, Object> firstK) {
+		List<Integer> ids = new ArrayList<Integer>();
+		IntDoublePairWritable v=null;
+		for(Object i: firstK.values()){
+			v=(IntDoublePairWritable) i;
+			ids.add(v.getThird());
+		}
+		return ids;
+	}
+
+	/**
+	 * 根据给定的users提取出来每个聚类中心，并把其写入hdfs
+	 * key,value--> <IntWritable ,DoubleArrIntWritable> --> <id,<type,用户有效向量>>
+	 * 同时把聚类中心写入本地文件
+	 * @param localfile 
+	 * @param users 
+	 * @param output 
+	 * @throws IOException 
+	 */
+	public static void writecenter2hdfs(List<UserData> users, String localfile, String output) throws IOException {
+		localfile=localfile==null?HUtils.LOCALCENTERFILE:localfile;
+		localfile=Utils.getRootPathBasedPath(localfile);
+		output=output==null?HUtils.FIRSTCENTERPATH:output;
+		
+		// 写入hdfs
+		SequenceFile.Writer writer = null;
+		Configuration conf = getConf();
+		try {
+			Option optPath = SequenceFile.Writer.file(HUtils.getHDFSPath(output, "false"));
+			Option optVal = SequenceFile.Writer
+					.valueClass(DoubleArrIntWritable.class);
+			Option optKey = SequenceFile.Writer.keyClass(IntWritable.class);
+			writer = SequenceFile.createWriter(conf, optPath, optKey, optVal);
+			DoubleArrIntWritable dVal = new DoubleArrIntWritable();
+			IntWritable dKey = new IntWritable();
+			int k=1;
+			for (Object user : users) {
+				
+				dVal.setValue(getDoubleArr(user),k++);
+//				dVal.setIdentifier(k++);
+				dKey.set(getIntVal(user));// 
+				writer.append(dKey, dVal);// 用户id,<type,用户的有效向量>
+			}
+		} catch (IOException e) {
+			Utils.simpleLog("writecenter2hdfs 失败,+hdfs file:"+output.toString());
+			e.printStackTrace();
+			throw e;
+		} finally {
+			IOUtils.closeStream(writer);
+		}
+		Utils.simpleLog("聚类中心向量已经写入HDFS："+output.toString());
+// 写入本地文件
+		FileWriter writer2 = null;
+		BufferedWriter bw = null;
+		try {
+			writer2 = new FileWriter(localfile);
+			bw = new BufferedWriter(writer2);
+			for(UserData user:users){
+				bw.write("id:"+user.getId()+"\tvector:["+
+					HUtils.doubleArr2Str(HUtils.getDoubleArr(user))+"]");
+				bw.newLine();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			try {
+				bw.close();
+				writer.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		Utils.simpleLog("聚类中心向量已经写入HDFS："+localfile.toString());
+		
+	}
+
+	/**
+	 * 
+	 * @param input
+	 * @param output
+	 */
+	public static void copy(String input, String output) {
+		FileSystem fs =getFs();
+		Configuration conf = getConf();
+		Path in= new Path(input);
+		Path out= new Path(output);
+		
+		try{
+			if(fs.exists(out)){//如果存在则删除
+				fs.delete(out, true);
+			}
+//			fs.create(out);// 新建
+			fs.mkdirs(out);
+			FileStatus[] files=fs.listStatus(in);
+			Path[] srcs= new Path[files.length];
+			for(int i=0;i<files.length;i++){
+				srcs[i]=files[i].getPath();
+			}
+			boolean flag =FileUtil.copy(fs,srcs,fs,out,false,true,conf);
+			Utils.simpleLog("数据从"+input.toString()+"传输到"+out.toString()+
+					(flag?"成功":"失败")+"!");
+		}catch(Exception e){
+			e.printStackTrace();
+			Utils.simpleLog("数据从"+input.toString()+"传输到"+out.toString()+
+					"失败"+"!");
+		}
+	}
+	/**
+	 * 获得一个文件夹的信息
+	 * 用于比较前后两次文件夹的内容是否一致
+	 * @param folder
+	 * @param flag true则floder字符串包含fs信息，否则不包含
+	 * @return
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	public static String getFolderInfo(String folder,String flag) throws FileNotFoundException, IOException{
+		StringBuffer buff = new StringBuffer();
+		FileSystem fs = getFs();
+		Path path = getHDFSPath(folder, flag);
+		
+		FileStatus[] files = fs.listStatus(path);
+		
+		buff.append("contain files:"+files.length+"\t[");
+		String filename="";
+		for(FileStatus file:files){
+			path = file.getPath();
+			filename=path.toString();
+			buff.append(filename.substring(filename.length()-1))
+				.append(":").append(file.getLen()).append(",");
+		}
+		filename=buff.substring(0, buff.length()-1);
+		
+		
+		return filename+"]";
+	}
+	/**
+	 * 获得一个文件夹下面的文件个数
+	 * @param folder
+	 * @param flag true则floder字符串包含fs信息，否则不包含
+	 * @return
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	public static  int getFolderFilesNum(String folder,String flag) throws FileNotFoundException, IOException{
+		FileSystem fs = getFs();
+		Path path = getHDFSPath(folder, flag);
+		
+		FileStatus[] files = fs.listStatus(path);
+		return files.length;
+	}
+
+	/**
+	 *  提取Map中的center中心向量
+	 * @param vectorsMap
+	 * @return
+	 */
+	public static double[][] getCenterVector(Map<Object, Object> vectorsMap) {
+		double[][] centers = new double[vectorsMap.size()][];
+		DoubleArrIntWritable value = null;
+		int i=0;
+		for(Object v:vectorsMap.values()){
+			value =(DoubleArrIntWritable) v;
+			centers[i++]=value.getDoubleArr();
+		}
+		
+		return centers;
 	}
 
 }
