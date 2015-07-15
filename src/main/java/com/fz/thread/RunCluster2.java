@@ -51,15 +51,25 @@ public class RunCluster2 implements Runnable {
 		
 		int iter_i=0;
 		int ret=0;
+		double tmpDelta=0;
+		int kInt = Integer.parseInt(k);
 		try {
 			do{
-				
-				log.info("this is the {} iteration,with dc:{}",new Object[]{iter_i,delta});
 				if(iter_i>=distances.length){
-					delta= String.valueOf(distances[distances.length-1]/2);
+//					delta= String.valueOf(distances[distances.length-1]/2);
+					// 这里使用什么方式还没有想好。。。
+					
+					
+					// 使用下面的方式
+					tmpDelta=Double.parseDouble(delta);
+					while(kInt-->0){// 超过k次后就不再增大
+						tmpDelta*=2;// 每次翻倍
+					}
+					delta=String.valueOf(tmpDelta);
 				}else{
 					delta=String.valueOf(distances[iter_i]/2);
 				}
+				log.info("this is the {} iteration,with dc:{}",new Object[]{iter_i,delta});
 				String[] ar={
 						HUtils.getHDFSPath(output)+iter_i+"/unclustered",
 						HUtils.getHDFSPath(output)+(iter_i+1),//output
@@ -80,12 +90,10 @@ public class RunCluster2 implements Runnable {
 				iter_i++;
 				HUtils.JOBNUM++;// 每次循环后加1
 
-			}while(shouldRunNextPhrase(iter_i,output));
+			}while(shouldRunNextIter());
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		} 
 		if(ret==0){
 			log.info("All cluster Job finished with iteration {}",new Object[]{iter_i});
 		}
@@ -94,27 +102,18 @@ public class RunCluster2 implements Runnable {
 	
 	/**
 	 * 是否应该继续下次循环
-	 * @param iter_i
-	 * @param output 
-	 * @return
+	 * 直接使用分类记录数和未分类记录数来判断
 	 * @throws IOException 
 	 * @throws IllegalArgumentException 
 	 */
-	private boolean shouldRunNextPhrase(int iter_i, String output) throws IllegalArgumentException, IOException {
-		String before = HUtils.getHDFSPath(output)+(iter_i-1)+"/unclustered/";
-		String next = HUtils.getHDFSPath(output)+iter_i+"/unclustered/";
-		if(HUtils.getFolderFilesNum(next, "true")==0){// 没有文件产生
+	private boolean shouldRunNextIter()  {
+		
+		if(HUtils.UNCLUSTERED==0||HUtils.CLUSTERED==0){
 			HUtils.JOBNUM-=2;// 不用监控 则减去2;
 			return false;
 		}
-		String beforeFolderInfo= HUtils.getFolderInfo(before, "true");
-		String nextFolderInfo = HUtils.getFolderInfo(next, "true");
-		if(beforeFolderInfo.equals(nextFolderInfo)){
-			HUtils.JOBNUM-=2;// 不用监控 则减去2;	
-			return false;
-		}
-		
 		return true;
+		
 	}
 	
 	public RunCluster2(){}

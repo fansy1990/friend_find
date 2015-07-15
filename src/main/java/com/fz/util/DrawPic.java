@@ -207,7 +207,7 @@ public class DrawPic {
 			}
 		}//for
 		//第一个点太大了，选择去掉
-		return allList.subList(2, allList.size());
+		return allList.subList(1, allList.size());
 	}
 
 	/**

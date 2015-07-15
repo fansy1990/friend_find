@@ -61,7 +61,12 @@ public class ClusterDataJob extends Configured implements Tool {
 	    SequenceFileOutputFormat.setOutputPath(job,new Path(otherArgs[1]));
 	    
 	    FileSystem.get(conf).delete(new Path(otherArgs[1]), true);
-	    return job.waitForCompletion(true) ? 0 : 1;
+	    int ret= job.waitForCompletion(true) ? 0 : 1;
+	    
+	    // 把已经分类的个数和未分类的个数赋值出去
+	    HUtils.CLUSTERED=job.getCounters().findCounter(ClusterCounter.CLUSTERED).getValue();
+	    HUtils.UNCLUSTERED=job.getCounters().findCounter(ClusterCounter.UNCLUSTERED).getValue();
+	    return ret;
 	}
 
 	

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.fz.thread;
+package com.fz.fastcluster;
 
 /**
  * @author fansy

@@ -125,9 +125,9 @@ public class CloudAction extends ActionSupport {
 	 * 非MR任务，不需要监控，注意返回值
 	 */
 	public void center2hdfs(){
-		//k: record
+
 		// localfile:method
-		// 1. 读取SortJob的输出，获取前面k条记录的id；
+		// 1. 读取SortJob的输出，获取前面k条记录中的大于局部密度和最小距离阈值的id；
 		// 2. 根据id，找到每个id对应的记录；
 		// 3. 把记录转为double[] ；
 		// 4. 把向量写入hdfs
@@ -139,11 +139,11 @@ public class CloudAction extends ActionSupport {
 		List<UserData> users=null;
 		try{
 		firstK=HUtils.readSeq(input==null?HUtils.SORTOUTPUT+"/part-r-00000":input,
-				Integer.parseInt(record));
-		ids=HUtils.getCentIds(firstK);
+				100);// 这里默认使用	前100条记录
+		ids=HUtils.getCentIds(firstK,numReducerDensity,numReducerDistance);
 		// 2
 		users = dBService.getTableData("UserData",ids);
-		
+		Utils.simpleLog("聚类中心向量有"+users.size()+"个！");
 		// 3,4,5
 		HUtils.writecenter2hdfs(users,method,output);
 		

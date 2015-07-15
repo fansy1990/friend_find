@@ -85,6 +85,10 @@ public class HUtils {
 
 	public static double DELTA_DC = 0.0;// DC阈值，
 	public static long INPUT_RECORDS = 0L;// 文件全部记录数，任务FindInitDCJob任务后对此值进行赋值
+	
+	// 聚类分类
+	public static long CLUSTERED=-1;
+	public static long UNCLUSTERED=-1;
 
 	// fast cluster
 	public static final String LOCALDENSITYOUTPUT = "/user/root/localdensity";
@@ -925,16 +929,22 @@ public class HUtils {
 
 	/**
 	 * 获取firstK中的id
-	 * {key:mul,value:third:id}
+	 * {key:mul,value:third:id}<first:density_i,second:min_distance_j,third:i>
 	 * @param firstK
+	 * @param numReducerDistance 
+	 * @param numReducerDensity 
 	 * @return
 	 */
-	public static List<Integer> getCentIds(Map<Object, Object> firstK) {
+	public static List<Integer> getCentIds(Map<Object, Object> firstK, String numReducerDensity, String numReducerDistance) {
 		List<Integer> ids = new ArrayList<Integer>();
 		IntDoublePairWritable v=null;
+		
 		for(Object i: firstK.values()){
 			v=(IntDoublePairWritable) i;
-			ids.add(v.getThird());
+			if(v.getFirst()>Double.parseDouble(numReducerDensity)&&
+					v.getSecond()>Double.parseDouble(numReducerDistance)){
+				ids.add(v.getThird());
+			}
 		}
 		return ids;
 	}

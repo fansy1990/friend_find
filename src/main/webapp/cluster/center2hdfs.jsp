@@ -17,12 +17,18 @@
 		<table>
 			
 			<tr>
-				<td><label for="name">聚类中心个数:</label>
+				<td><label for="name">局部密度阈值:</label>
 				</td>
 				<td><input class="easyui-validatebox" type="text"
-					id="center2hdfs_k_id" data-options="required:true" 
-					value="10" /></td>
-
+					id="center2hdfs_density" data-options="required:true" 
+					value="50" /></td>
+			</tr>
+			<tr>
+				<td><label for="name">最小距离阈值:</label>
+				</td>
+				<td><input class="easyui-validatebox" type="text"
+					id="center2hdfs_distance" data-options="required:true" 
+					value="50" /></td>
 			</tr>
 			
 			<tr>

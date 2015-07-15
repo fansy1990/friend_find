@@ -41,7 +41,8 @@ $(function(){
 	
 	// cent2hdfs---
 	$('#center2hdfs_submit_id').bind('click', function(){
-		var k=$('#center2hdfs_k_id').val();// 聚类中心向量个数 
+		var density=$('#center2hdfs_density').val();// 局部密度阈值
+		var distance=$('#center2hdfs_distance').val();// 最小距离阈值
 		var input_=$('#center2hdfs_input_id').val();
 		var output_=$('#center2hdfs_output_id').val();
 		var localfile=$('#center2hdfs_localfile_id').val();
@@ -50,7 +51,8 @@ $(function(){
 		popupProgressbar('寻找聚类中心','聚类中心寻找并上传中...',1000);
 		// ajax 异步提交任务
 		console.info('here');
-		callByAJax('cloud/cloud_center2hdfs.action',{input:input_,output:output_,record:k,method:localfile});
+		callByAJax('cloud/cloud_center2hdfs.action',{input:input_,output:output_,
+			numReducerDensity:density,numReducerDistance:distance,method:localfile});
 	});
 	
 	// ------cent2hdfs
