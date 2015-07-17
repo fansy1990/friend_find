@@ -31,7 +31,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 				</tr>				
 				<tr>
 					<td><label for="name">距离阈值:</label></td>
-					<td><input class="easyui-validatebox" type="text"
+					<td><input class="easyui-validatebox" type="text" value="29"
 						id="runcluster2_delta" name="delta" data-options="required:true"  />
 					</td>
 					
@@ -39,7 +39,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 				<tr>
 					<td><label for="name">聚类中心数:</label></td>
 					<td><input class="easyui-validatebox" type="text"
-						id="runcluster2_k" value="10" data-options="required:true"  />
+						id="runcluster2_k" value="4" data-options="required:true"  />
 					</td>			
 				<tr>
 					<td><a id="runcluster2_submitid" href=""

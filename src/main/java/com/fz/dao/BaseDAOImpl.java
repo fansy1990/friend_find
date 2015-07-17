@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;  
 import org.springframework.stereotype.Repository;  
 
+import com.fz.util.Utils;
+
   
 @Repository("baseDAO")  
 @SuppressWarnings("all")  
@@ -203,6 +205,7 @@ public class BaseDAOImpl<T> implements BaseDAO<T> {
 		}
 //		tx.commit();
 //		session.close();
+		Utils.simpleLog("插入数据数为："+i);
 		return i;
 	}
 

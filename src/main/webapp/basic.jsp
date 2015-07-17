@@ -23,7 +23,7 @@
 	
 	<div data-options="region:'north',border:false" style="height:60px;background:#B3DFDA;padding:10px;">
 	<h1>Friend Find</h1> </div>
-	<div data-options="region:'west',split:true,title:'West'" style="width:170px;padding:10px;">
+	<div data-options="region:'west',split:true,title:'West'" style="width:190px;padding:10px;">
 		<ul id="navid" class="easyui-tree" data-options="url:'json/tree_data.json',method:'get',animate:true,dnd:true"></ul>
 	</div>
 	<!-- 

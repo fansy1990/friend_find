@@ -109,6 +109,24 @@ public class DBService {
 		return jsonMap;
 	}
 	
+	/**
+	 * 保存数据
+	 * @param tableName
+	 * @param list
+	 * @return
+	 */
+	public boolean saveTableData(List<Object> list	){
+		
+		try{
+			baseDao.saveBatch(list);
+		}catch(Exception e){
+			e.printStackTrace();
+			return false;
+		}
+		
+		return true;
+	}
+	
 	public boolean deleteById(String tableName,String id){
 		String hql ="delete " + tableName +"  tb where tb.id='"+id+"'";
 		try{
@@ -121,8 +139,21 @@ public class DBService {
 		return true;
 	}
 	
+	public boolean deleteTable(String tableName){
+		String hql ="delete " + tableName ;
+		try{
+			Integer ret = baseDao.executeHql(hql);
+			log.info("删除表{},删除了{}条记录！",new Object[]{tableName,ret});
+		}catch(Exception e){
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+	
 	/**
 	 * 更新或者插入表
+	 * 不用每个表都建立一个方法，这里根据表名自动装配
 	 * @param tableName
 	 * @param json
 	 * @return
@@ -288,6 +319,25 @@ public class DBService {
 			uds.add((UserData)baseDao.find(hql, new Object[]{id}).get(0));
 		}
 		return uds;
+	}
+	/**
+	 * 获取分类数据占比
+	 * @param i 
+	 * @return
+	 */
+	public List<String> getPercent(int k) {
+		double[] percents= new double[k];
+		double sum=0;
+		String hql ="select count(1) from UserGroup ug where ug.groupType=?";
+		for(int i=0;i<k;i++){
+			percents[i]=baseDao.count(hql, new Object[]{i+1});
+			sum+=percents[i];
+		}
+		List<String> list = new ArrayList<String>();
+		for(int i=0;i<k;i++){
+			list.add(Utils.obejct2Percent(percents[i]/sum, 2));// 保留两位小数
+		}
+		return list;
 	}
 	
 	

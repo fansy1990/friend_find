@@ -3,6 +3,7 @@
  */
 package com.fz.thread;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
@@ -29,10 +30,19 @@ public class RunCluster2 implements Runnable {
 	@Override
 	public void run() {
 		input=input==null?HUtils.FILTER_PREPAREVECTORS:input;
-		output=output==null?HUtils.CENTERPATHPREFIX:output+"/iter_";
-	
-		// 加一个操作，把/user/root/preparevectors里面的数据复制到/user/root/_center/iter_0/unclustered里面
 		
+		// 删除iter_i(i>0)的所有文件
+		try {
+			HUtils.clearCenter((output==null?HUtils.CENTERPATH:output));
+		} catch (FileNotFoundException e2) {
+			e2.printStackTrace();
+		} catch (IOException e2) {
+			e2.printStackTrace();
+		}
+		
+		output=output==null?HUtils.CENTERPATHPREFIX:output+"/iter_";
+		
+		// 加一个操作，把/user/root/preparevectors里面的数据复制到/user/root/_center/iter_0/unclustered里面
 		HUtils.copy(input,output+"0/unclustered");
 		try {
 			Thread.sleep(200);// 暂停200ms 

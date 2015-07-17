@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -362,6 +363,41 @@ public class Utils {
 		// sort 
 		Arrays.sort(distances);
 		return distances;
+	}
+
+	/**
+	 * 获得input的数据，每行作为一个字符串，全部数据放入list中
+	 * @param input
+	 * @return
+	 * @throws IOException 
+	 */
+	public static List<String> getLines(String input) throws IOException {
+		List<String> list = new ArrayList<String>();
+		input = Utils.getRootPathBasedPath(input);
+		FileReader reader = new FileReader(input);
+        BufferedReader br = new BufferedReader(reader);
+       
+        String line = null;
+        while((line = br.readLine()) != null) {
+        	list.add(line);
+       	 }
+       
+        br.close();
+        reader.close();
+		return list;
+	}
+	/**
+	 * double 或者float或者int转为百分数
+	 * @param dou
+	 * @param dotNum
+	 * @return
+	 */
+	public static String obejct2Percent(Object dou,int dotNum){
+		double dd= (Double)dou;
+		//百分数格式化
+		NumberFormat fmt = NumberFormat.getPercentInstance();
+		fmt.setMaximumFractionDigits(dotNum);//最多dotNum位百分小数
+		return fmt.format(dd);
 	}
 	
 }

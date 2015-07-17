@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +44,7 @@ import com.fz.fastcluster.keytype.IntDoublePairWritable;
 import com.fz.filter.keytype.DoubleArrIntWritable;
 import com.fz.model.CurrentJobInfo;
 import com.fz.model.UserData;
+import com.fz.model.UserGroup;
 
 /**
  * Hadoop 工具类
@@ -790,6 +792,7 @@ public class HUtils {
 
 	/**
 	 * List  解析入HDFS
+	 * 
 	 * @param list
 	 * @param fileNums 
 	 * @throws IOException
@@ -950,6 +953,7 @@ public class HUtils {
 	}
 
 	/**
+	 * 每次写入聚类中心之前，需要把前一次的结果删掉，防止重复,不应该在这里删除，应该在执行分类的时候删除
 	 * 根据给定的users提取出来每个聚类中心，并把其写入hdfs
 	 * key,value--> <IntWritable ,DoubleArrIntWritable> --> <id,<type,用户有效向量>>
 	 * 同时把聚类中心写入本地文件
@@ -962,6 +966,7 @@ public class HUtils {
 		localfile=localfile==null?HUtils.LOCALCENTERFILE:localfile;
 		localfile=Utils.getRootPathBasedPath(localfile);
 		output=output==null?HUtils.FIRSTCENTERPATH:output;
+		
 		
 		// 写入hdfs
 		SequenceFile.Writer writer = null;
@@ -1108,5 +1113,87 @@ public class HUtils {
 		
 		return centers;
 	}
+	/**
+	 * 解析input里面的clustered里面的分类数据到List中
+	 * @param input
+	 * @return
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	
+	public static List<Object> resolve(String input) throws FileNotFoundException, IOException{
+		List<Object> list = new ArrayList<Object>();
+		
+		Path path = HUtils.getHDFSPath(input, "false");
+		FileSystem fs = HUtils.getFs();
+		
+		RemoteIterator<LocatedFileStatus>files =fs.listFiles(path, true);
+		
+		while(files.hasNext()){
+			LocatedFileStatus lfs = files.next();
+			
+			input = lfs.getPath().toString();
+			if(input.contains("/clustered/part")&&!input.contains("iter_0")){// 不包含iter_0目录
+				path= lfs.getPath();
+				if(lfs.getLen()>0){
+					list.addAll(resolve(path));
+				}
+			}
+		}
+		Utils.simpleLog("一共读取了"+list.size()+"条记录！");
+		return list;
+	}
+
+	/**
+	 * 把分类的数据解析到list里面
+	 * @param path
+	 * @return
+	 */
+	private static Collection<? extends UserGroup> resolve(Path path) {
+		// TODO Auto-generated method stub
+		List<UserGroup> list = new ArrayList<UserGroup>();
+		Configuration conf = HUtils.getConf();
+		SequenceFile.Reader reader = null;
+		int i=0;
+		try {
+			reader = new SequenceFile.Reader(conf, Reader.file(path),
+					Reader.bufferSize(4096), Reader.start(0));
+			IntWritable dkey =  (IntWritable) ReflectionUtils
+					.newInstance(reader.getKeyClass(), conf);
+			DoubleArrIntWritable dvalue =  (DoubleArrIntWritable) ReflectionUtils
+					.newInstance(reader.getValueClass(), conf);
+
+			while (reader.next(dkey, dvalue)) {// 循环读取文件
+				// 使用这个进行克隆
+				list.add(new UserGroup(i++,dkey.get(),dvalue.getIdentifier()));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			IOUtils.closeStream(reader);
+		}
+		Utils.simpleLog("读取"+list.size()+"条记录，文件："+path.toString());
+		return list;
+	}
+
+	/**
+	 * 删除_center/iter_i (i>0)的所有文件夹
+	 * @param output 
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
+	 */
+	public static void clearCenter(String output) throws FileNotFoundException, IOException {
+		
+		FileStatus[] fss = getFs().listStatus(HUtils.getHDFSPath(output, "false"));
+		
+		for(FileStatus f:fss){
+			if(f.toString().contains("iter_0")){
+				continue;
+			}
+			getFs().delete(f.getPath(), true);
+			Utils.simpleLog("删除文件"+f.getPath().toString()+"!");
+		}
+	}
+
 
 }

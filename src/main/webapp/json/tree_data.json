@@ -138,25 +138,31 @@
 		}]
 	},{
 		"id":14,
-		"text":"图表展示",
+		"text":"聚类中心及推荐",
 		"attributes":{
 				"folder":"1"
 		},
 		"children":[{
 			"id":141,
-			"text":"聚类中心",
+			"text":"组别入库",
 			"attributes":{
 				"folder":"0",
-				"url":""
+				"url":"recommend/group2db.jsp"
 			}
 		},{
 			"id":142,
-			"text":"聚类群组",
+			"text":"聚类中心及占比",
 			"attributes":{
 				"folder":"0",
-				"url":""
+				"url":"recommend/group.jsp"
 			}
-			
+		},{
+			"id":143,
+			"text":"用户查询及推荐",
+			"attributes":{
+				"folder":"0",
+				"url":"recommend/check_recommend.jsp"
+			}
 		}]
 	},{
 		"id":15,
@@ -165,12 +171,5 @@
 				"folder":"0",
 				"url":"about.html"
 			}
-	},{
-		"id":16,
-		"text":"welcome.html",
-		"attributes":{
-				"folder":"0",
-				"url":"index.jsp"
-		}
 	}]
 }]

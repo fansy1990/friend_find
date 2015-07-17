@@ -189,6 +189,57 @@ public class CloudAction extends ActionSupport {
 		}
 		Utils.write2PrintWriter(JSON.toJSONString(map));
 	}
+	/**
+	 * 云平台已经分类好的数据解析并存入数据库中
+	 */
+	public void group2db(){
+		Map<String,Object> map = new HashMap<String,Object>();
+		map.put("monitor", "false");
+		try{
+			// 解析
+			List<Object> list = HUtils.resolve(input);
+			// 清库，并入库
+			dBService.deleteTable("UserGroup");
+			dBService.saveTableData(list);
+			map.put("flag", "true");
+		}catch(Exception e){
+			map.put("flag", "false");
+			e.printStackTrace();
+		}
+		Utils.write2PrintWriter(JSON.toJSONString(map));
+		return ;
+		
+	}
+	/**
+	 * 解析本地聚类中心数据，并获得数据库中分类数据占比情况
+	 * 返回前台显示
+	 */
+	public void groupcheck(){
+		Map<String,Object> map = new HashMap<String,Object>();
+		List<String> centerVec=null;
+		List<String> percentVec=null;
+		try{
+			input = input==null ? HUtils.LOCALCENTERFILE:input;
+			centerVec= Utils.getLines(input);
+			percentVec=  dBService.getPercent(centerVec.size());
+			// 整合数据
+			StringBuffer buff = new StringBuffer();
+			buff.append("<br>");
+			for(int i=0;i<centerVec.size();i++){
+				buff.append("聚类中心："+centerVec.get(i)+"\t,占比："+percentVec.get(i)+"<br>");
+			}
+			map.put("html", buff.toString());
+			map.put("flag","true");
+		}catch(Exception e){
+			map.put("flag", "false");
+			map.put("msg", "解析聚类中心出错！");
+			e.printStackTrace();
+		}
+		Utils.write2PrintWriter(JSON.toJSONString(map));
+		return ;
+	}
+	
+	
 	
 	/**
 	 * 数据库数据解析到云平台,为序列文件，是聚类运行的输入文件
