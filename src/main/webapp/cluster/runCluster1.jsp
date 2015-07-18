@@ -35,8 +35,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 					<td>
 					<select id="method" class="easyui-combobox" name="method"
 						style="width:200px;">
-							<option value="gaussian">Gaussian算法</option>
 							<option value="cutoff">Cut-off算法</option>
+							<option value="gaussian">Gaussian算法</option>
 						</select>
 					</td>
 				</tr>
@@ -54,7 +54,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 					</td>
 				</tr>
 				<tr>
-					<td><label for="name">排序MR Reducer个数:</label></td>
+					<td><label for="name">排序MR Reducer个数(支持设置1个):</label></td>
 					<td><input class="easyui-validatebox" type="text"
 						 name="numReducerSort" data-options="required:true" value="1" />
 					</td>
