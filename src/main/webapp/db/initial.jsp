@@ -30,10 +30,10 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 			<option value="HConstants">集群配置表</option>
 
 		</select> 
-		<!-- 
+	
 		<a id="initialId" href="#" class="easyui-linkbutton"
 			data-options="iconCls:'icon-search'">初始化</a> <br> 
-		-->
+	
 		<br>
 		<br>
 		<!-- 	
