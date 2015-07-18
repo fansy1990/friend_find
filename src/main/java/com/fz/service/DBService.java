@@ -18,6 +18,7 @@ import com.fz.dao.BaseDAO;
 import com.fz.model.HConstants;
 import com.fz.model.LoginUser;
 import com.fz.model.UserData;
+import com.fz.model.UserGroup;
 import com.fz.util.Utils;
 
 /**
@@ -338,6 +339,61 @@ public class DBService {
 			list.add(Utils.obejct2Percent(percents[i]/sum, 2));// 保留两位小数
 		}
 		return list;
+	}
+	/**
+	 * 获取推荐信息
+	 * 1. 根据id查询UserGroup看是否有记录；
+	 * 2. 如有记录，则用户有推荐的朋友；跳转到4；
+	 * 3. 如果没有，则返回说当前用户没有分组；
+	 * 4. 根据查询的groupType再次查询所有该组的id；
+	 * 5. 根据4中的id去UserData中查找数据并显示；
+	 * @param id
+	 * @param page 
+	 * @param rows 
+	 * @return
+	 * @throws Exception 
+	 */
+	public Map<String, Object> getRecommendData(String id, int rows, int page) throws Exception {
+		Map<String,Object >map = new HashMap<String,Object>();
+		String hql = "from UserGroup ug where ug.userId=?";
+		Object ug = null;
+		try{
+			ug=baseDao.get(hql, new Object[]{Integer.parseInt(id)});
+			if(ug==null){// 
+				map.put("flag", "false");
+				map.put("html", "当前用户没有分组,不能推荐朋友！");
+				map.put("msg","当天用户没有分组!");
+				return map;
+			}
+			UserGroup userG= (UserGroup	)ug;
+			int groupType =userG.getGroupType();
+			hql= "select count(1) from UserGroup ug where ug.groupType=?";
+			long total =(long) baseDao.count(hql, new Object[]{groupType});
+			hql="from UserGroup ug where ug.groupType=?";
+			List<Object>userGroups = baseDao.find(hql, new Object[]{groupType}, page, rows);
+			
+			List<UserData> userDatas = new ArrayList<UserData>();
+			UserData ud=null;
+			hql = "from UserData ud where ud.id=?";
+			for(Object u:userGroups){
+				userG=(UserGroup) u;
+				ud=(UserData) baseDao.get(hql, new Object[]{userG.getUserId()});
+				userDatas.add(ud);
+			}
+			map.put("flag", "true");
+			map.put("html", "当前用户的分组是："+groupType+",下面是该用户的推荐朋友：");
+			map.put("total", total);
+			map.put("rows", userDatas);
+		}catch(Exception e){
+			e.printStackTrace();
+			map.put("flag", "false");
+			map.put("html", "后台运行出错！");
+			map.put("msg","后台运行出错!");
+			throw e;
+		}
+		
+		
+		return map;
 	}
 	
 	

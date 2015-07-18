@@ -41,6 +41,23 @@ public class DBAction extends ActionSupport {
 	}
 	
 	/**
+	 * 获取推荐信息
+	 */
+	public void getRecommendData(){
+		Map<String,Object> map = null;
+		
+		try{
+			map=dBService.getRecommendData(id,rows,page);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		String json =JSON.toJSONString(map);
+		log.info(json);
+		Utils.write2PrintWriter(json);
+		return ;
+	}
+	
+	/**
 	 * 安装id删除表中数据
 	 */
 	public void deleteById(){

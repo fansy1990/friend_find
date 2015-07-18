@@ -10,7 +10,7 @@
 	<script type="text/javascript" src="js/jquery.easyui.min.js"></script>
 	<script type="text/javascript" src="js/basic.js"></script>
 	<script type="text/javascript" src="js/loginuser.js"></script>
-	<script type="text/javascript" src="js/monitor.js"></script>
+	<script type="text/javascript" src="js/recommend.js"></script>
 	<script type="text/javascript" src="js/runCluster.js"></script>
 	
 	

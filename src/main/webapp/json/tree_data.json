@@ -161,7 +161,7 @@
 			"text":"用户查询及推荐",
 			"attributes":{
 				"folder":"0",
-				"url":"recommend/check_recommend.jsp"
+				"url":"recommend/recommend.jsp"
 			}
 		}]
 	},{
