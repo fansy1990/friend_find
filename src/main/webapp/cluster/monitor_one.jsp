@@ -63,7 +63,6 @@
 	<script type="text/javascript">
 		// 自动定时刷新 1s
 	 	var monitor_cf_interval= setInterval("monitor_one_refresh()",3000);
-		
 	</script>
 	<script type="text/javascript" src="js/preprocess.js"></script>
   </body>

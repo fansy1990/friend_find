@@ -121,11 +121,10 @@ public class CloudAction extends ActionSupport {
 		return ;
 	}
 	/**
-	 * 根据给定的k值寻找聚类中心向量，并写入hdfs
+	 * 根据给定的阈值寻找聚类中心向量，并写入hdfs
 	 * 非MR任务，不需要监控，注意返回值
 	 */
 	public void center2hdfs(){
-
 		// localfile:method
 		// 1. 读取SortJob的输出，获取前面k条记录中的大于局部密度和最小距离阈值的id；
 		// 2. 根据id，找到每个id对应的记录；
@@ -145,9 +144,7 @@ public class CloudAction extends ActionSupport {
 		users = dBService.getTableData("UserData",ids);
 		Utils.simpleLog("聚类中心向量有"+users.size()+"个！");
 		// 3,4,5
-		HUtils.writecenter2hdfs(users,method,output);
-		
-		
+		HUtils.writecenter2hdfs(users,method,output);	
 		}catch(Exception e){
 			e.printStackTrace();
 			retMap.put("flag", "false");

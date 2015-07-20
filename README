@@ -1,4 +1,5 @@
 Friend Find 系统
+项目介绍可以参考：http://blog.csdn.net/fansy1990/article/details/46943657
 
 系统版本V2.0
 
@@ -30,5 +31,7 @@ Hibernate4.3.1，struts2.3.1，Maven3.2.1
    2. 根据聚类中心，执行分类，得到每个用户的类别；
    3. 解析每个用户的类别，并存入数据库中；
    4. 根据用户组别，推荐组内用户；
+   
+
  
     

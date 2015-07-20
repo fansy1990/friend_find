@@ -11,7 +11,6 @@ package com.fz.fastcluster.keytype;
  * @date 2015-7-3
  */
 
-
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
@@ -70,7 +69,7 @@ public class CustomDoubleWritable implements WritableComparable<CustomDoubleWrit
  }
  
  @Override
- public int compareTo(CustomDoubleWritable o) {
+ public int compareTo(CustomDoubleWritable o) {// 修改这里即可
    return (value < o.value ? 1 : (value == o.value ? 0 : -1));
  }
  

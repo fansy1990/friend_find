@@ -324,20 +324,17 @@ public class HUtils {
 
 	/**
 	 * 下载文件
-	 * 
 	 * @param hdfsPath
 	 * @param localPath
 	 *            ,本地文件夹
 	 * @return
 	 */
 	public static Map<String, Object> downLoad(String hdfsPath, String localPath) {
-
 		Map<String, Object> ret = new HashMap<String, Object>();
 		FileSystem fs = getFs();
 		Path src = new Path(hdfsPath);
 		Path dst = new Path(localPath);
 		try {
-			// fs.copyFromLocalFile(src, dst);
 			RemoteIterator<LocatedFileStatus> fss = fs.listFiles(src, true);
 			int i = 0;
 			while (fss.hasNext()) {
@@ -346,8 +343,6 @@ public class HUtils {
 					// 使用这个才能下载成功
 					fs.copyToLocalFile(false, file.getPath(), new Path(dst,
 							"hdfs_" + (i++) + HUtils.DOWNLOAD_EXTENSION), true);
-					// fs.moveToLocalFile(file.getPath(), new
-					// Path(dst,"hdfs_"+i++));
 				}
 			}
 		} catch (Exception e) {
@@ -410,7 +405,6 @@ public class HUtils {
 	 * @return
 	 */
 	public static double findInitDC(double percent, String path,long iNPUT_RECORDS2) {
-
 		Path input = null;
 		if (path == null) {
 			input = new Path(HUtils.getHDFSPath(HUtils.FILTER_CALDISTANCE
@@ -423,14 +417,12 @@ public class HUtils {
 		long counter = 0;
 		long percent_ = (long) (percent * iNPUT_RECORDS2);
 		try {
-			
 			reader = new SequenceFile.Reader(conf, Reader.file(input),
 					Reader.bufferSize(4096), Reader.start(0));
 			DoubleWritable dkey = (DoubleWritable) ReflectionUtils.newInstance(
 					reader.getKeyClass(), conf);
 			Writable dvalue = (Writable) ReflectionUtils.newInstance(
 					reader.getValueClass(), conf);
-
 			while (reader.next(dkey, dvalue)) {// 循环读取文件
 				counter++;
 				if(counter%1000==0){
@@ -446,7 +438,6 @@ public class HUtils {
 		} finally {
 			IOUtils.closeStream(reader);
 		}
-
 		return HUtils.DELTA_DC;
 	}
 

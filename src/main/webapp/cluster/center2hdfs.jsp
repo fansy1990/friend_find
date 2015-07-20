@@ -7,7 +7,7 @@
 	<div style="padding-left: 30px;font-size: 15px;padding-top:10px;"><br>
 		DB过滤到HDFS处理包括：<br>
 		<ol>
-			<li>根据提供的聚类中心个数，提取出聚类中心</li>
+			<li>根据提供的聚类中心的局部密度和最小距离阈值，提取出聚类中心</li>
 			<li>把聚类中心序列化到HDFS中</li>
 			<li>把聚类中心写入本地文件</li>
 		</ol>
